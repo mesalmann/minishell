@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: senadere <senadere@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hdere <hdere@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/18 17:01:28 by mesalman          #+#    #+#             */
-/*   Updated: 2026/02/26 23:49:57 by senadere         ###   ########.fr       */
+/*   Updated: 2026/02/27 04:40:03 by hdere            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,6 +158,8 @@ char    *ft_strchr(const char *s, int c);
 void    *ft_memset(void *b, int c, size_t len);
 char    **ft_split(char const *s, char c); // split.c ile uyumlu olmalı (tek char delimiter)
 char    *ft_substr(char const *s, unsigned int start, size_t len);
+void    ft_putstr_fd(const char *s, int fd);
+void    ft_putendl_fd(const char *s, int fd);
 
 
 /****************************Sena *************************/
@@ -171,6 +173,9 @@ bool		ms_ctx_init(t_ctx *ctx, char **envp);
 void		ms_ctx_destroy(t_ctx *ctx);
 
 /* env */
+int     ms_is_builtin_argv(char **argv);
+int     ms_builtin_run_argv(t_ctx *ctx, char **argv);
+int     ms_builtin_pwd(void);
 char		*ms_env_get(t_ctx *ctx, const char *key);
 bool		ms_env_set(t_ctx *ctx, const char *key, const char *val, bool has_val);
 bool		ms_env_unset(t_ctx *ctx, const char *key);
@@ -201,6 +206,9 @@ char		*ms_resolve_path(t_ctx *ctx, const char *file);
 bool		ms_apply_redirs(t_cmdnode *cmd, int *saved_stdin, int *saved_stdout);
 void		ms_restore_stdio(int saved_stdin, int saved_stdout);
 bool		ms_run_heredocs(t_ctx *ctx, t_cmdnode *pipeline);
+
+
+void	ms_execute_pipeline(t_ctx *ctx, t_cmdnode *pipeline);
 
 /* builtins */
 typedef enum e_bltin

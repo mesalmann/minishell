@@ -4,7 +4,16 @@ CFLAGS = -Wall -Wextra -Werror -g -I. -I/opt/homebrew/opt/readline/include
 LDFLAGS = -L/opt/homebrew/opt/readline/lib
 LDLIBS = -lreadline -lhistory -lncurses
 
-SRCS = srcs/main.c srcs/init.c srcs/exec_simple.c srcs/split.c srcs/utils.c
+SRCS = \
+	srcs/main.c \
+	srcs/init.c \
+	srcs/exec_simple.c \
+	srcs/split.c \
+	srcs/utils.c \
+	srcs/lexer.c \
+	srcs/executer.c\
+	srcs/builtins/builtins_utils.c \
+	srcs/builtins/ms_pwd.c
 OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)

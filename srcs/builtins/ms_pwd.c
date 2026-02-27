@@ -7,8 +7,8 @@ int	ms_builtin_pwd(void)
 	if (getcwd(cwd, sizeof(cwd)) != NULL)
 	{
 		printf("%s\n", cwd);
-		return (0); // Başarılı exit kodu
+		return (0); 
 	}
 	perror("pwd");
-	return (1); // Hata kodu
+	return (1); 
 }
