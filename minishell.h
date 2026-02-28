@@ -74,6 +74,13 @@ typedef enum e_tokkind
 	TK_OP,         /* one of: < > >> << | */
 }	t_tokkind;
 
+typedef enum e_qstate
+{
+	Q_NONE = 0,
+	Q_SINGLE,
+	Q_DOUBLE
+}	t_qstate;
+
 typedef enum e_opkind
 {
 	OP_NONE = 0,
@@ -231,5 +238,5 @@ int			ms_builtin_run(t_ctx *ctx, t_cmdnode *cmd);
 int			ms_err_syntax(t_ctx *ctx, const char *msg); /* sets last_status=2 */
 int			ms_err_errno(t_ctx *ctx, const char *where); /* uses errno */
 int			count_words(char const *s, char c);
-
+t_token	*token_new(t_tokkind kind, t_opkind op, char *lex);
 #endif
