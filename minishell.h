@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mesalman <mesalman@student.42istanbul.com  +#+  +:+       +#+        */
+/*   By: hdere <hdere@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/18 17:01:28 by mesalman          #+#    #+#             */
-/*   Updated: 2026/01/18 17:02:22 by mesalman         ###   ########.fr       */
+/*   Updated: 2026/01/27 01:22:53 by hdere            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,17 +137,34 @@ typedef struct s_cmdnode
 
 typedef struct s_ctx
 {
-	t_envnode	*env;          /* your canonical env model */
-	char		**envp_cache;  /* optional: regenerated when env changes */
-	bool		env_dirty;     /* if true, rebuild envp_cache before execve */
+	t_envnode	*env;          /* Bağlı liste (Linked list) başı */
+	char		**envp_cache;  /* / execve'ye verilecek char** dizisi */
+	bool		env_dirty;     // Cache yenilenmeli mi bayrağı (flag)
 
-	int			last_status;   /* $? reads from here */
-	bool		interactive;   /* isatty(STDIN_FILENO) */
+	int			last_status;   /* $? değeri (son komutun çıkış kodu)*/
+	bool		interactive;   /* isatty(STDIN_FILENO)  Shell interaktif modda mı?*/
 }	t_ctx;
 
 /* ************************************************************************** */
 /*                           MODULE API (PROTOTYPES)                          */
 /* ************************************************************************** */
+
+/* Utils (Libft fonksiyonlarının prototipleri) */
+size_t  ft_strlen(const char *s);
+char    *ft_strjoin(char const *s1, char const *s2);
+char    *ft_strdup(const char *s1);
+int     ft_strncmp(const char *s1, const char *s2, size_t n);
+char    *ft_strchr(const char *s, int c);
+void    *ft_memset(void *b, int c, size_t len);
+char    **ft_split(char const *s, char c); // split.c ile uyumlu olmalı (tek char delimiter)
+char    *ft_substr(char const *s, unsigned int start, size_t len);
+
+
+/****************************Sena *************************/
+void ms_loop(t_ctx *ctx, char **envp);
+void    ms_exec_simple(t_ctx *ctx, char **argv, char **envp);
+void    free_tab(char **tab);
+
 
 /* init / teardown */
 bool		ms_ctx_init(t_ctx *ctx, char **envp);
@@ -205,6 +222,6 @@ int			ms_builtin_run(t_ctx *ctx, t_cmdnode *cmd);
 /* errors */
 int			ms_err_syntax(t_ctx *ctx, const char *msg); /* sets last_status=2 */
 int			ms_err_errno(t_ctx *ctx, const char *where); /* uses errno */
-int		count_words(char const *s, char c)
+int			count_words(char const *s, char c);
 
 #endif
