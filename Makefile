@@ -13,11 +13,15 @@ SRCS = \
 	srcs/executer.c \
 	srcs/builtins/builtins_utils.c \
 	srcs/builtins/ms_pwd.c \
+	srcs/builtins/ms_echo.c \
+	srcs/builtins/ms_env.c \
 	srcs/lexer/lexer.c \
 	srcs/syntax/syntax_check.c \
 	srcs/expander/expander_core.c \
 	srcs/expander/expander_vars.c \
-	srcs/parser.c
+	srcs/parser.c \
+	srcs/redirs.c \
+	srcs/env.c
 OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)

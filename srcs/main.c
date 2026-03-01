@@ -79,5 +79,6 @@ int main(int ac, char **av, char **envp) {
 
   ms_loop(&ctx, envp);
 
+  ms_ctx_destroy(&ctx);
   return (ctx.last_status);
 }

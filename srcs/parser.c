@@ -291,6 +291,10 @@ void ms_cmd_free(t_cmdnode *cmd) {
   h = cmd->heredocs;
   while (h) {
     htmp = h->next;
+    if (h->pipe_rd >= 0)
+      close(h->pipe_rd);
+    if (h->pipe_wr >= 0)
+      close(h->pipe_wr);
     free(h->delim);
     free(h);
     h = htmp;
