@@ -7,20 +7,20 @@ static bool check_first_token(t_token *tokens) {
 }
 
 static bool check_last_token_and_adjacent(t_token *tokens) {
-  t_token *curr;
+  t_token *curr = tokens;
 
-  curr = tokens;
   while (curr) {
     if (curr->kind == TK_OP) {
-      // Redirection must be followed by a WORD.
+
+      // Redirection must be followed by WORD
       if (curr->op != OP_PIPE) {
         if (!curr->next || curr->next->kind != TK_WORD)
           return (false);
       }
-      // Pipe must be followed by something valid (WORD or Redir).
+
+      // Pipe must be followed by a command
       else {
-        if (!curr->next ||
-            (curr->next->kind == TK_OP && curr->next->op == OP_PIPE))
+        if (!curr->next || curr->next->kind != TK_WORD)
           return (false);
       }
     }
