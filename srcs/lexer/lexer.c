@@ -76,29 +76,47 @@ static t_token *handle_operator(const char *line, int *i) {
 
 /*
 ** Check if a word token is a quoted heredoc delimiter.
-** If the first char is ' or " => the delimiter is quoted => no_expand.
+** Scans the entire string for any single or double quote => no_expand.
+** Handles: 'EOF', "EOF", E"O"F, E'O'F, etc.
 */
 static bool is_quoted_word(const char *s) {
-  if (!s || !s[0])
+  int i;
+
+  if (!s)
     return (false);
-  return (s[0] == '\'' || s[0] == '"');
+  i = 0;
+  while (s[i]) {
+    if (s[i] == '\'' || s[i] == '"')
+      return (true);
+    i++;
+  }
+  return (false);
 }
 
 /*
-** Strip outer quotes from a heredoc delimiter string.
-** 'EOF' -> EOF, "EOF" -> EOF.
-** Only strips the very first and very last character.
+** Strip ALL quotes from a heredoc delimiter string.
+** 'EOF' -> EOF, E"O"F -> EOF, E'O'F -> EOF.
+** Copies every character that is not a quote character.
 */
 static char *strip_delim_quotes(const char *s) {
-  size_t len;
+  char *out;
+  int i;
+  int k;
 
-  len = ft_strlen(s);
-  if (len < 2)
-    return (ft_strdup(s));
-  if ((s[0] == '\'' && s[len - 1] == '\'') ||
-      (s[0] == '"' && s[len - 1] == '"'))
-    return (ft_substr(s, 1, len - 2));
-  return (ft_strdup(s));
+  if (!s)
+    return (NULL);
+  out = malloc(ft_strlen(s) + 1);
+  if (!out)
+    return (NULL);
+  i = 0;
+  k = 0;
+  while (s[i]) {
+    if (s[i] != '\'' && s[i] != '"')
+      out[k++] = s[i];
+    i++;
+  }
+  out[k] = '\0';
+  return (out);
 }
 
 static t_token *handle_word(const char *line, int *i) {
