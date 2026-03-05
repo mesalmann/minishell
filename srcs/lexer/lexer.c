@@ -268,6 +268,7 @@ t_token *ms_tokenize(const char *line, t_ctx *ctx) {
       new = handle_word(line, &i);
     if (!new) {
       ms_token_free(head);
+      ft_putendl_fd("minishell: syntax error near unexpected token", 2);
       if (ctx)
         ctx->last_status = 2;
       return (NULL);
