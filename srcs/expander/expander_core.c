@@ -104,6 +104,7 @@ char *ms_expand_str(t_ctx *ctx, const char *in, bool in_dquote) {
     }
     if (in[i] == '$' && st != Q_SINGLE) {
       i++;
+      /* $? → son çıkış kodu */
       if (in[i] == '?') {
         val = ft_itoa(ctx->last_status);
         if (!val || !sb_pushs(&out, &len, &cap, val)) {
@@ -115,6 +116,7 @@ char *ms_expand_str(t_ctx *ctx, const char *in, bool in_dquote) {
         i++;
         continue;
       }
+      /* $VAR_NAME → environment lookup */
       if (is_var_start(in[i])) {
         int start = i;
         while (in[i] && is_var_char(in[i]))
@@ -132,6 +134,18 @@ char *ms_expand_str(t_ctx *ctx, const char *in, bool in_dquote) {
         }
         continue;
       }
+      /*
+      ** $<rakam>: positional parametre yok → rakamı tüket, boş string ver.
+      ** Bash davranışı: $1 → "" (minishell'de script modu yok).
+      */
+      if (in[i] >= '0' && in[i] <= '9') {
+        i++; /* rakamı tüket, hiçbir şey basma */
+        continue;
+      }
+      /*
+      ** $<geçersiz> veya tek $ → literal '$' bas, karakteri tüketme.
+      ** Örnek: "$@" → "$@", "$ " → "$ ", "$" (eol) → "$".
+      */
       if (!sb_pushc(&out, &len, &cap, '$')) {
         free(out);
         return (NULL);

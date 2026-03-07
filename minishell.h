@@ -220,8 +220,9 @@ t_bltin ms_builtin_kind(const char *name);
 int ms_builtin_run(t_ctx *ctx, t_cmdnode *cmd);
 
 /* errors */
-int ms_err_syntax(t_ctx *ctx, const char *msg);  /* sets last_status=2 */
-int ms_err_errno(t_ctx *ctx, const char *where); /* uses errno */
+int ms_err_syntax(t_ctx *ctx, const char *msg); /* sets last_status=2 */
+int ms_err_errno(t_ctx *ctx,
+                 const char *where); /* prints strerror, sets last_status=1 */
 int count_words(char const *s, char c);
 t_token *token_new(t_tokkind kind, t_opkind op, char *lex);
 #endif

@@ -193,6 +193,9 @@ static bool parse_ios(t_cmdnode *cmd, t_token *t) {
       else if (t->op == OP_OUT_APPEND)
         rt = RD_OUT_APPEND;
       t = t->next;
+      /* syntax_check bunu yakalamış olmalı; yine de NULL guard */
+      if (!t || t->kind != TK_WORD)
+        return (false);
       r = redir_new(rt, ft_strdup(t->lex));
       if (!r || !r->target) {
         if (r)
@@ -205,7 +208,10 @@ static bool parse_ios(t_cmdnode *cmd, t_token *t) {
     }
     if (t->kind == TK_OP && t->op == OP_HEREDOC) {
       t = t->next;
-      /* no_expand=true means delimiter was quoted → no $ expansion */
+      /* syntax_check bunu yakalamış olmalı; yine de NULL guard */
+      if (!t || t->kind != TK_WORD)
+        return (false);
+      /* no_expand=true → delimiter'da quote vardı → $ expand etme */
       delim = ft_strdup(t->lex);
       if (!delim)
         return (false);
