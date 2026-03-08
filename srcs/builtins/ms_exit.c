@@ -85,7 +85,7 @@ static void	exit_numeric_error(t_ctx *ctx, const char *arg)
 int	ms_builtin_exit(t_ctx *ctx, char **argv)
 {
 	int	status;
-
+	//buraya if kontrolü, eğer interaktif modda değilsek exit yazmasın. 
 	ft_putendl_fd("exit", STDERR_FILENO);
 	if (!argv[1])
 	{
