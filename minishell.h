@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hdere <hdere@student.42.fr>                +#+  +:+       +#+        */
+/*   By: senadere <senadere@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/18 17:01:28 by mesalman          #+#    #+#             */
-/*   Updated: 2026/02/27 04:40:03 by hdere            ###   ########.fr       */
+/*   Updated: 2026/03/08 03:42:12 by senadere         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,6 +170,10 @@ int ms_builtin_run_argv(t_ctx *ctx, char **argv);
 int ms_builtin_pwd(void);
 int ms_builtin_echo(char **argv);
 int ms_builtin_env(t_ctx *ctx);
+int ms_builtin_cd(t_ctx *ctx, char **argv);
+int ms_builtin_export(t_ctx *ctx, char **argv);
+int ms_builtin_unset(t_ctx *ctx, char **argv);
+int ms_builtin_exit(t_ctx *ctx, char **argv);
 char *ms_env_get(t_ctx *ctx, const char *key);
 bool ms_env_set(t_ctx *ctx, const char *key, const char *val, bool has_val);
 bool ms_env_unset(t_ctx *ctx, const char *key);
@@ -225,4 +229,5 @@ int ms_err_errno(t_ctx *ctx,
                  const char *where); /* prints strerror, sets last_status=1 */
 int count_words(char const *s, char c);
 t_token *token_new(t_tokkind kind, t_opkind op, char *lex);
+int ms_is_valid_identifier(const char *s);
 #endif

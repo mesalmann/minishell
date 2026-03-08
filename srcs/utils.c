@@ -1,5 +1,21 @@
 #include "../minishell.h"
 
+int ms_is_valid_identifier(const char *s) {
+  int i;
+
+  if (!s || !s[0])
+    return (0);
+  if (s[0] != '_' && !isalpha((unsigned char)s[0]))
+    return (0);
+  i = 1;
+  while (s[i]) {
+    if (s[i] != '_' && !isalnum((unsigned char)s[i]))
+      return (0);
+    i++;
+  }
+  return (1);
+}
+
 size_t ft_strlen(const char *s) {
   size_t i = 0;
   while (s[i])

@@ -249,11 +249,47 @@ static void mark_heredoc_delim(t_token *prev_op, t_token *word_tok) {
   }
 }
 
+static int	has_unmatched_quote(const char *s, int i)
+{
+	t_qstate	st;
+
+	st = Q_NONE;
+	while (s[i])
+	{
+		if (st == Q_NONE)
+		{
+			if (ms_is_end(s[i]))
+				break ;
+			if (s[i] == '\'')
+				st = Q_SINGLE;
+			else if (s[i] == '"')
+				st = Q_DOUBLE;
+		}
+		else if (st == Q_SINGLE)
+		{
+			if (s[i] == '\'')
+				st = Q_NONE;
+		}
+		else
+		{
+			if (s[i] == '"')
+				st = Q_NONE;
+		}
+		i++;
+	}
+	if (st == Q_SINGLE)
+		return ('\'');
+	if (st == Q_DOUBLE)
+		return ('"');
+	return (0);
+}
+
 t_token *ms_tokenize(const char *line, t_ctx *ctx) {
   t_token *head;
   t_token *tail;
   t_token *new;
   int i;
+  int uq;
 
   head = NULL;
   tail = NULL;
@@ -264,8 +300,20 @@ t_token *ms_tokenize(const char *line, t_ctx *ctx) {
       break;
     if (is_operator(line[i]))
       new = handle_operator(line, &i);
-    else
+    else {
+      uq = has_unmatched_quote(line, i);
       new = handle_word(line, &i);
+      if (!new && uq) {
+        ms_token_free(head);
+        ft_putstr_fd("minishell: unexpected EOF while looking for matching `",
+                      2);
+        write(2, &(char){(char)uq}, 1);
+        ft_putendl_fd("'", 2);
+        if (ctx)
+          ctx->last_status = 2;
+        return (NULL);
+      }
+    }
     if (!new) {
       ms_token_free(head);
       ft_putendl_fd("minishell: syntax error near unexpected token", 2);

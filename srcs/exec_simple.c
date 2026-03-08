@@ -125,6 +125,8 @@ void	ms_exec_simple(t_ctx *ctx, t_cmdnode *cmd)
 	pid = fork();
 	if (pid == 0)
 	{
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
 		if (!ms_apply_redirs(cmd, NULL, NULL))
 		{
 			free(path);
@@ -153,4 +155,15 @@ void	ms_exec_simple(t_ctx *ctx, t_cmdnode *cmd)
 		free(path);
 		ctx->last_status = 1;
 	}
+}
+
+/*
+** ms_resolve_path - executer.c'den erişilebilen path wrapper'ı.
+** ms_find_path (static, aynı dosya) çağırır; envp_cache'i otomatik günceller.
+*/
+char	*ms_resolve_path(t_ctx *ctx, const char *file)
+{
+	if (ctx->env_dirty && !ms_env_build_envp(ctx))
+		return (NULL);
+	return (ms_find_path((char *)file, ctx->envp_cache));
 }

@@ -46,6 +46,27 @@ static bool	load_env(t_ctx *ctx, char **envp)
 	return (true);
 }
 
+static void	increment_shlvl(t_ctx *ctx)
+{
+	char	*val;
+	int		level;
+	char	*new_val;
+
+	val = ms_env_get(ctx, "SHLVL");
+	if (val)
+		level = atoi(val) + 1;
+	else
+		level = 1;
+	if (level < 0)
+		level = 0;
+	new_val = ft_itoa(level);
+	if (new_val)
+	{
+		ms_env_set(ctx, "SHLVL", new_val, true);
+		free(new_val);
+	}
+}
+
 bool	ms_ctx_init(t_ctx *ctx, char **envp)
 {
 	ft_memset(ctx, 0, sizeof(t_ctx));
@@ -59,6 +80,7 @@ bool	ms_ctx_init(t_ctx *ctx, char **envp)
 		if (!load_env(ctx, envp))
 			return (false);
 	}
+	increment_shlvl(ctx);
 	return (true);
 }
 

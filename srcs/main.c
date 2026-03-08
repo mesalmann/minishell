@@ -1,15 +1,32 @@
 #include "../minishell.h"
 volatile sig_atomic_t g_sig = 0;
 
-void handle_sigint(int sig) {
-  (void)sig;
-  write(1, "\n", 1);
+static void	handle_sigint(int sig)
+{
+	(void)sig;
+	write(1, "\n", 1);
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
+	g_sig = SIGINT;
+}
 
-  rl_on_new_line();
-  rl_replace_line("", 0);
-  rl_redisplay();
+/*
+** ms_sig_install_interactive - interaktif mod sinyal kurulumu.
+** Ctrl-C (SIGINT) → handle_sigint  (yeni prompt, g_sig set)
+** Ctrl-\ (SIGQUIT) → yoksay (SIG_IGN)
+** sigaction kullanılır: tek global kural (g_sig) korunur.
+*/
+void	ms_sig_install_interactive(void)
+{
+	struct sigaction	sa;
 
-  g_sig = SIGINT;
+	sa.sa_flags = 0;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_handler = handle_sigint;
+	sigaction(SIGINT, &sa, NULL);
+	sa.sa_handler = SIG_IGN;
+	sigaction(SIGQUIT, &sa, NULL);
 }
 
 void ms_loop(t_ctx *ctx, char **envp) {
@@ -71,8 +88,7 @@ int main(int ac, char **av, char **envp) {
   (void)ac;
   (void)av;
 
-  signal(SIGINT, handle_sigint); // Ctrl-C ile çıkış yapmayı sağlayan signal.
-  signal(SIGQUIT, SIG_IGN);
+  ms_sig_install_interactive();
 
   if (ms_ctx_init(&ctx, envp) == false)
     return 1;
