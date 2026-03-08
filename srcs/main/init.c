@@ -1,4 +1,16 @@
-#include "../minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hdere <hdere@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/08 12:00:00 by hdere             #+#    #+#             */
+/*   Updated: 2026/03/08 07:44:55 by hdere            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minishell.h"
 #include <string.h>
 
 /*
@@ -6,51 +18,53 @@
 ** Her giriş "KEY=VALUE" formatındadır (standart envp garantisi).
 ** '=' yoksa: anahtar olarak ekler, has_val=false (güvenli fallback).
 */
-static bool	load_env(t_ctx *ctx, char **envp)
+static bool load_env_entry(t_ctx *ctx, char *entry)
 {
-	int		i;
-	char	*eq;
-	char	*key;
-	char	*val;
+	char *eq;
+	char *key;
+	char *val;
+
+	eq = strchr(entry, '=');
+	if (!eq)
+		return (ms_env_set(ctx, entry, NULL, false));
+	key = ft_substr(entry, 0, (size_t)(eq - entry));
+	val = ft_strdup(eq + 1);
+	if (!key || !val)
+	{
+		free(key);
+		free(val);
+		return (false);
+	}
+	if (!ms_env_set(ctx, key, val, true))
+	{
+		free(key);
+		free(val);
+		return (false);
+	}
+	free(key);
+	free(val);
+	return (true);
+}
+
+static bool load_env(t_ctx *ctx, char **envp)
+{
+	int i;
 
 	i = 0;
 	while (envp[i])
 	{
-		eq = strchr(envp[i], '=');
-		if (eq)
-		{
-			key = ft_substr(envp[i], 0, (size_t)(eq - envp[i]));
-			val = ft_strdup(eq + 1);
-			if (!key || !val)
-			{
-				free(key);
-				free(val);
-				return (false);
-			}
-			if (!ms_env_set(ctx, key, val, true))
-			{
-				free(key);
-				free(val);
-				return (false);
-			}
-			free(key);
-			free(val);
-		}
-		else
-		{
-			if (!ms_env_set(ctx, envp[i], NULL, false))
-				return (false);
-		}
+		if (!load_env_entry(ctx, envp[i]))
+			return (false);
 		i++;
 	}
 	return (true);
 }
 
-static void	increment_shlvl(t_ctx *ctx)
+static void increment_shlvl(t_ctx *ctx)
 {
-	char	*val;
-	int		level;
-	char	*new_val;
+	char *val;
+	int level;
+	char *new_val;
 
 	val = ms_env_get(ctx, "SHLVL");
 	if (val)
@@ -67,7 +81,7 @@ static void	increment_shlvl(t_ctx *ctx)
 	}
 }
 
-bool	ms_ctx_init(t_ctx *ctx, char **envp)
+bool ms_ctx_init(t_ctx *ctx, char **envp)
 {
 	ft_memset(ctx, 0, sizeof(t_ctx));
 	ctx->interactive = isatty(STDIN_FILENO);
@@ -88,13 +102,13 @@ bool	ms_ctx_init(t_ctx *ctx, char **envp)
 ** ms_ctx_destroy - ctx'nin tüm dinamik kaynaklarını serbest bırakır.
 ** main() çıkışında çağrılmalıdır.
 */
-void	ms_ctx_destroy(t_ctx *ctx)
+void ms_ctx_destroy(t_ctx *ctx)
 {
-	t_envnode	*node;
-	t_envnode	*tmp;
+	t_envnode *node;
+	t_envnode *tmp;
 
 	if (!ctx)
-		return ;
+		return;
 	node = ctx->env;
 	while (node)
 	{

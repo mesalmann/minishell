@@ -1,180 +1,127 @@
-#include "../../minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   expander_core.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hdere <hdere@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/08 12:00:00 by hdere             #+#    #+#             */
+/*   Updated: 2026/03/08 07:44:39 by hdere            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-static bool sb_grow(char **buf, size_t *cap, size_t need);
-static bool sb_pushc(char **buf, size_t *len, size_t *cap, char c);
-static bool sb_pushs(char **buf, size_t *len, size_t *cap, const char *s);
+#include "minishell.h"
 
-static bool is_var_start(char c) {
-  return ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_');
+static bool expand_var_name(t_ctx *ctx, t_expbuf *eb, const char *in)
+{
+    int start;
+    char *name;
+    char *val;
+
+    start = eb->i;
+    while (in[eb->i] && ms_is_var_char(in[eb->i]))
+        eb->i++;
+    name = ft_substr(in, (unsigned int)start, (size_t)(eb->i - start));
+    if (!name)
+        return (false);
+    val = ms_env_get(ctx, name);
+    free(name);
+    return (ms_sb_pushs(&eb->out, &eb->len, &eb->cap, val));
 }
 
-static bool is_var_char(char c) {
-  return (is_var_start(c) || (c >= '0' && c <= '9'));
-}
+static bool expand_dollar(t_ctx *ctx, t_expbuf *eb, const char *in)
+{
+    char *val;
 
-static char *substr_dup(const char *s, int start, int end) {
-  if (end <= start)
-    return (ft_strdup(""));
-  return (ft_substr(s, (unsigned int)start, (size_t)(end - start)));
-}
-
-static bool sb_grow(char **buf, size_t *cap, size_t need) {
-  size_t newcap;
-  char *nbuf;
-
-  if (*cap >= need)
-    return (true);
-  newcap = *cap;
-  if (newcap == 0)
-    newcap = 32;
-  while (newcap < need)
-    newcap *= 2;
-  nbuf = malloc(newcap);
-  if (!nbuf)
-    return (false);
-  if (*buf) {
-    memcpy(nbuf, *buf, ft_strlen(*buf) + 1);
-    free(*buf);
-  }
-  *buf = nbuf;
-  *cap = newcap;
-  return (true);
-}
-
-static bool sb_pushc(char **buf, size_t *len, size_t *cap, char c) {
-  if (!sb_grow(buf, cap, *len + 2))
-    return (false);
-  (*buf)[*len] = c;
-  (*len)++;
-  (*buf)[*len] = '\0';
-  return (true);
-}
-
-static bool sb_pushs(char **buf, size_t *len, size_t *cap, const char *s) {
-  size_t i;
-
-  if (!s)
-    return (true);
-  i = 0;
-  while (s[i]) {
-    if (!sb_pushc(buf, len, cap, s[i]))
-      return (false);
-    i++;
-  }
-  return (true);
-}
-char *ms_expand_str(t_ctx *ctx, const char *in, bool in_dquote) {
-  t_qstate st;
-  size_t len;
-  size_t cap;
-  int i;
-  char *out;
-  char *name;
-  char *val;
-
-  (void)in_dquote;
-  st = Q_NONE;
-  out = NULL;
-  len = 0;
-  cap = 0;
-  i = 0;
-  if (!sb_grow(&out, &cap, 1))
-    return (NULL);
-  out[0] = '\0';
-  while (in && in[i]) {
-    if (st == Q_NONE && in[i] == '\'') {
-      st = Q_SINGLE;
-      i++;
-      continue;
-    }
-    if (st == Q_NONE && in[i] == '"') {
-      st = Q_DOUBLE;
-      i++;
-      continue;
-    }
-    if (st == Q_SINGLE && in[i] == '\'') {
-      st = Q_NONE;
-      i++;
-      continue;
-    }
-    if (st == Q_DOUBLE && in[i] == '"') {
-      st = Q_NONE;
-      i++;
-      continue;
-    }
-    if (in[i] == '$' && st != Q_SINGLE) {
-      i++;
-      /* $? → son çıkış kodu */
-      if (in[i] == '?') {
+    eb->i++;
+    if (in[eb->i] == '?')
+    {
         val = ft_itoa(ctx->last_status);
-        if (!val || !sb_pushs(&out, &len, &cap, val)) {
-          free(val);
-          free(out);
-          return (NULL);
+        if (!val)
+            return (false);
+        if (!ms_sb_pushs(&eb->out, &eb->len, &eb->cap, val))
+        {
+            free(val);
+            return (false);
         }
         free(val);
-        i++;
-        continue;
-      }
-      /* $VAR_NAME → environment lookup */
-      if (is_var_start(in[i])) {
-        int start = i;
-        while (in[i] && is_var_char(in[i]))
-          i++;
-        name = substr_dup(in, start, i);
-        if (!name) {
-          free(out);
-          return (NULL);
-        }
-        val = ms_env_get(ctx, name);
-        free(name);
-        if (!sb_pushs(&out, &len, &cap, val)) {
-          free(out);
-          return (NULL);
-        }
-        continue;
-      }
-      /*
-      ** $<rakam>: positional parametre yok → rakamı tüket, boş string ver.
-      ** Bash davranışı: $1 → "" (minishell'de script modu yok).
-      */
-      if (in[i] >= '0' && in[i] <= '9') {
-        i++; /* rakamı tüket, hiçbir şey basma */
-        continue;
-      }
-      /*
-      ** $<geçersiz> veya tek $ → literal '$' bas, karakteri tüketme.
-      ** Örnek: "$@" → "$@", "$ " → "$ ", "$" (eol) → "$".
-      */
-      if (!sb_pushc(&out, &len, &cap, '$')) {
-        free(out);
-        return (NULL);
-      }
-      continue;
+        eb->i++;
+        return (true);
     }
-    if (!sb_pushc(&out, &len, &cap, in[i])) {
-      free(out);
-      return (NULL);
+    if (ms_is_var_start(in[eb->i]))
+        return (expand_var_name(ctx, eb, in));
+    if (in[eb->i] >= '0' && in[eb->i] <= '9')
+    {
+        eb->i++;
+        return (true);
     }
-    i++;
-  }
-  return (out);
+    return (ms_sb_pushc(&eb->out, &eb->len, &eb->cap, '$'));
 }
 
-bool ms_expand_argv(t_ctx *ctx, char ***argv_io) {
-  int i;
-  char *new;
-
-  if (!argv_io || !*argv_io)
+static bool handle_quote_toggle(t_expbuf *eb, char c)
+{
+    if (eb->st == Q_NONE && c == '\'')
+        eb->st = Q_SINGLE;
+    else if (eb->st == Q_NONE && c == '"')
+        eb->st = Q_DOUBLE;
+    else if (eb->st == Q_SINGLE && c == '\'')
+        eb->st = Q_NONE;
+    else if (eb->st == Q_DOUBLE && c == '"')
+        eb->st = Q_NONE;
+    else
+        return (false);
+    eb->i++;
     return (true);
-  i = 0;
-  while ((*argv_io)[i]) {
-    new = ms_expand_str(ctx, (*argv_io)[i], false);
-    if (!new)
-      return (false);
-    free((*argv_io)[i]);
-    (*argv_io)[i] = new;
-    i++;
-  }
-  return (true);
+}
+
+char *ms_expand_str(t_ctx *ctx, const char *in, bool in_dquote)
+{
+    t_expbuf eb;
+
+    (void)in_dquote;
+    ft_memset(&eb, 0, sizeof(t_expbuf));
+    if (!ms_sb_grow(&eb.out, &eb.cap, 1))
+        return (NULL);
+    eb.out[0] = '\0';
+    while (in && in[eb.i])
+    {
+        if (handle_quote_toggle(&eb, in[eb.i]))
+            continue;
+        if (in[eb.i] == '$' && eb.st != Q_SINGLE)
+        {
+            if (!expand_dollar(ctx, &eb, in))
+            {
+                free(eb.out);
+                return (NULL);
+            }
+            continue;
+        }
+        if (!ms_sb_pushc(&eb.out, &eb.len, &eb.cap, in[eb.i]))
+        {
+            free(eb.out);
+            return (NULL);
+        }
+        eb.i++;
+    }
+    return (eb.out);
+}
+
+bool ms_expand_argv(t_ctx *ctx, char ***argv_io)
+{
+    int i;
+    char *new;
+
+    if (!argv_io || !*argv_io)
+        return (true);
+    i = 0;
+    while ((*argv_io)[i])
+    {
+        new = ms_expand_str(ctx, (*argv_io)[i], false);
+        if (!new)
+            return (false);
+        free((*argv_io)[i]);
+        (*argv_io)[i] = new;
+        i++;
+    }
+    return (true);
 }

@@ -1,9 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ms_exit.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hdere <hdere@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/08 12:00:00 by hdere             #+#    #+#             */
+/*   Updated: 2026/03/08 07:32:08 by hdere            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../minishell.h"
 #include <limits.h>
 
-static int	is_numeric(const char *s)
+static int is_numeric(const char *s)
 {
-	int	i;
+	int i;
 
 	i = 0;
 	if (s[i] == '-' || s[i] == '+')
@@ -19,25 +31,22 @@ static int	is_numeric(const char *s)
 	return (1);
 }
 
-static int	is_overflow(const char *s)
+static int is_overflow(const char *s)
 {
-	int					i;
-	int					neg;
-	unsigned long long	res;
-	unsigned long long	limit;
+	int i;
+	int neg;
+	unsigned long long res;
+	unsigned long long limit;
 
 	i = 0;
 	neg = 0;
+	res = 0;
 	if (s[i] == '-' || s[i] == '+')
 	{
 		neg = (s[i] == '-');
 		i++;
 	}
-	res = 0;
-	if (neg)
-		limit = (unsigned long long)LLONG_MAX + 1;
-	else
-		limit = (unsigned long long)LLONG_MAX;
+	limit = (unsigned long long)LLONG_MAX + neg;
 	while (s[i])
 	{
 		if (res > (limit - (s[i] - '0')) / 10)
@@ -50,11 +59,11 @@ static int	is_overflow(const char *s)
 	return (0);
 }
 
-static long long	ft_atoll(const char *s)
+static long long ft_atoll(const char *s)
 {
-	long long	res;
-	int			sign;
-	int			i;
+	long long res;
+	int sign;
+	int i;
 
 	res = 0;
 	sign = 1;
@@ -73,7 +82,7 @@ static long long	ft_atoll(const char *s)
 	return (res * sign);
 }
 
-static void	exit_numeric_error(t_ctx *ctx, const char *arg)
+static void exit_numeric_error(t_ctx *ctx, const char *arg)
 {
 	ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
 	ft_putstr_fd(arg, STDERR_FILENO);
@@ -82,10 +91,10 @@ static void	exit_numeric_error(t_ctx *ctx, const char *arg)
 	exit(2);
 }
 
-int	ms_builtin_exit(t_ctx *ctx, char **argv)
+int ms_builtin_exit(t_ctx *ctx, char **argv)
 {
-	int	status;
-	//buraya if kontrolü, eğer interaktif modda değilsek exit yazmasın. 
+	int status;
+
 	ft_putendl_fd("exit", STDERR_FILENO);
 	if (!argv[1])
 	{

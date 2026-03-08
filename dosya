@@ -1,0 +1,60 @@
+export asd="asdasd" | asdas="asfas" | şşşşşşşşş="asdasdscv"
+
+minishell$ echo $asdasd 124124
+ 124124
+
+cat << EOF | cat > asd.txt | cat > basd.txt
+
+cat << ""'""'a'""'""
+
+> asd.txt
+
+$HOME
+
+exit
+
+exit | exit
+
+pwd | pwd
+
+builtinleri childda çalıştırma
+
+hdere@k1m02s06:/sgoinfre/hdere/minishell$ echo '$USER'
+echo "$USER"
+echo "$USER$HOME"
+echo "'$USER'"
+echo '"$USER"'
+echo $USER'$HOME'
+echo "$USER"'$HOME'
+$USER
+hdere
+hdere/home/hdere
+'hdere'
+"$USER"
+hdere$HOME
+hdere$HOME
+hdere@k1m02s06:/sgoinfre/hdere/minishell$ echo "$USER"'$HOME'
+önemli bi nokta! mervenin aklına gelecek (ayn knk)
+
+
+
+
+minishell$ echo $1
+
+minishell$ echo $123
+23
+
+
+
+
+minishell$ echo $_
+/usr/bin/valgrind
+minishell$ 
+
+
+minishell$ echo hello > a.txt
+cat a.txt
+echo world > a.txt
+cat a.txt
+minishell$ 
+burada toplu çalışıyor 
