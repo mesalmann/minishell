@@ -16,6 +16,7 @@ static void exec_builtin_simple(t_ctx *ctx, t_cmdnode *cmd)
 {
     int saved_in;
     int saved_out;
+    int ret;
 
     saved_in = -1;
     saved_out = -1;
@@ -25,7 +26,21 @@ static void exec_builtin_simple(t_ctx *ctx, t_cmdnode *cmd)
         ctx->last_status = 1;
         return;
     }
-    ctx->last_status = ms_builtin_run_argv(ctx, cmd->argv);
+
+    if (cmd->argv && strcmp(cmd->argv[0], "exit") == 0 && ctx->interactive)
+        ft_putendl_fd("exit", STDERR_FILENO);
+
+    ret = ms_builtin_run_argv(ctx, cmd->argv);
+
+    if (ret == -1)
+    {
+        ms_restore_stdio(saved_in, saved_out);  
+        ms_ctx_destroy(ctx);
+        rl_clear_history();
+        exit(ctx->last_status);
+    }
+    
+    ctx->last_status = ret;
     ms_restore_stdio(saved_in, saved_out);
 }
 

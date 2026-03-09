@@ -26,11 +26,21 @@ static void child_setup_io(int *pipes, int n, int i)
 static void child_run_cmd(t_ctx *ctx, t_cmdnode *cmd)
 {
     char *path;
+    int ret;
 
     if (!ms_apply_redirs(cmd, NULL, NULL))
         _exit(1);
     if (ms_is_builtin_argv(cmd->argv))
-        _exit(ms_builtin_run_argv(ctx, cmd->argv));
+    {
+        ret = ms_builtin_run_argv(ctx, cmd->argv);
+        if (ret == -1)
+        {
+            int status = ctx->last_status;
+            ms_ctx_destroy(ctx);
+            _exit(status);
+        }
+        _exit(ret);
+    }
     if (ctx->env_dirty && !ms_env_build_envp(ctx))
         _exit(1);
     path = ms_resolve_path(ctx, cmd->argv[0]);
