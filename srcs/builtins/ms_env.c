@@ -7,25 +7,24 @@
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/08 12:00:00 by hdere             #+#    #+#             */
 /*   Updated: 2026/03/08 07:08:53 by hdere            ###   ########.fr       */
-/*                                                                            */
+/*                                                                        	    */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-/*
-** ms_builtin_env - shell'in env listesini KEY=VALUE formatında basar.
-**
-** Kural:
-**   - Sadece has_val == true olan node'lar basılır.
-**     (export KEY → has_val=false → env çıktısına girmez)
-**   - value NULL ise KEY= olarak basılır (boş değer, yine de geçerli).
-**   - Argümanlar görmezden gelinir (minishell scope'u dışında).
-**   - Her zaman 0 döner.
-*/
-int	ms_builtin_env(t_ctx *ctx)
+int ms_builtin_env(t_ctx *ctx, char **argv)
 {
 	t_envnode	*node;
 
+	if (argv && argv[1])
+	{
+        ft_putstr_fd("env: '", STDERR_FILENO);
+        ft_putstr_fd(argv[1], STDERR_FILENO);
+        ft_putendl_fd("': No such file or directory", STDERR_FILENO);
+        return (127); 
+    
+	}
+	
 	node = ctx->env;
 	while (node)
 	{

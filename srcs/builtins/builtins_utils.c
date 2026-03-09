@@ -43,7 +43,7 @@ int	ms_builtin_run_argv(t_ctx *ctx, char **argv)
 	if (strcmp(argv[0], "pwd") == 0)
 		return (ms_builtin_pwd());
 	if (strcmp(argv[0], "env") == 0)
-		return (ms_builtin_env(ctx));
+		return (ms_builtin_env(ctx, argv));
 	if (strcmp(argv[0], "cd") == 0)
 		return (ms_builtin_cd(ctx, argv));
 	if (strcmp(argv[0], "export") == 0)
@@ -55,9 +55,6 @@ int	ms_builtin_run_argv(t_ctx *ctx, char **argv)
 	return (1);
 }
 
-/*
-** ms_builtin_kind - komut adından builtin enum değeri döndür.
-*/
 t_bltin	ms_builtin_kind(const char *name)
 {
 	if (!name)
@@ -79,9 +76,6 @@ t_bltin	ms_builtin_kind(const char *name)
 	return (BI_NONE);
 }
 
-/*
-** ms_builtin_run - t_cmdnode arayüzü üzerinden builtin çalıştır.
-*/
 int	ms_builtin_run(t_ctx *ctx, t_cmdnode *cmd)
 {
 	if (!cmd || !cmd->argv || !cmd->argv[0])

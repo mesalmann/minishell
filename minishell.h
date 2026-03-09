@@ -153,7 +153,7 @@ int ms_is_builtin_argv(char **argv);
 int ms_builtin_run_argv(t_ctx *ctx, char **argv);
 int ms_builtin_pwd(void);
 int ms_builtin_echo(char **argv);
-int ms_builtin_env(t_ctx *ctx);
+int	ms_builtin_env(t_ctx *ctx, char **argv);
 int ms_builtin_cd(t_ctx *ctx, char **argv);
 int ms_builtin_export(t_ctx *ctx, char **argv);
 int ms_builtin_unset(t_ctx *ctx, char **argv);
