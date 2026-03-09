@@ -27,6 +27,8 @@ static void child_run_cmd(t_ctx *ctx, t_cmdnode *cmd)
 {
     char *path;
     int ret;
+    if (!cmd->argv || !cmd->argv[0]) 
+        _exit(0);
 
     if (!ms_apply_redirs(cmd, NULL, NULL))
         _exit(1);

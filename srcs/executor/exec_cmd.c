@@ -99,6 +99,17 @@ void ms_exec_simple(t_ctx *ctx, t_cmdnode *cmd)
 {
     char *path;
     pid_t pid;
+    if (!cmd->argv || !cmd->argv[0])
+    {
+        int s_in = -1;
+        int s_out = -1;
+        if (ms_apply_redirs(cmd, &s_in, &s_out))
+            ctx->last_status = 0;
+        else
+            ctx->last_status = 1;
+        ms_restore_stdio(s_in, s_out);
+        return;
+    }
 
     if (ms_is_builtin_argv(cmd->argv))
     {
