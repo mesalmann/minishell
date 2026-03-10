@@ -167,7 +167,7 @@ void ms_sig_install_interactive(void);
 t_token *ms_tokenize(const char *line, t_ctx *ctx);
 void ms_token_free(t_token *toks);
 bool ms_syntax_validate(t_token *tokens, t_ctx *ctx);
-bool ms_expand_tokens(t_token *tokens, t_ctx *ctx);
+bool ms_expand_tokens(t_token **tokens, t_ctx *ctx);
 char *ms_expand_str(t_ctx *ctx, const char *in, bool in_dquote);
 bool ms_expand_argv(t_ctx *ctx, char ***argv_io);
 t_cmdnode *ms_parse(t_token *toks, t_ctx *ctx);

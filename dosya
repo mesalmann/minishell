@@ -1,6 +1,6 @@
-export asd="asdasd" | asdas="asfas" | şşşşşşşşş="asdasdscv"
+export asd="asdasd" | asdas="asfas" | şşşşşşşşş="asdasdscv"  // ANLAMADIM AMA CASE ÇALIŞIYOR İŞTE
 
-minishell$ echo $asdasd 124124
+minishell$ echo $asdasd 124124 //HALLEDİLDİ
  124124
 
 cat << EOF | cat > asd.txt | cat > basd.txt

@@ -37,25 +37,30 @@ void ms_sig_install_interactive(void)
 	sigaction(SIGQUIT, &sa, NULL);
 }
 
-static void ms_process_line(t_ctx *ctx, char *line)
+static void	ms_process_line(t_ctx *ctx, char *line)
 {
-	t_token *tokens;
-	t_cmdnode *ast;
+	t_token		*tokens;
+	t_cmdnode	*ast;
 
 	add_history(line);
 	tokens = ms_tokenize(line, ctx);
 	if (!tokens)
-		return;
+		return ;
 	if (!ms_syntax_validate(tokens, ctx))
 	{
 		ms_token_free(tokens);
-		return;
+		return ;
 	}
-	if (!ms_expand_tokens(tokens, ctx))
+	if (!ms_expand_tokens(&tokens, ctx))
 	{
 		ctx->last_status = 1;
 		ms_token_free(tokens);
-		return;
+		return ;
+	}
+	if (!tokens)
+	{
+		ctx->last_status = 0;
+		return ;
 	}
 	ast = ms_parse(tokens, ctx);
 	if (ast)
