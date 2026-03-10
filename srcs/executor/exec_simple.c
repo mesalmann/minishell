@@ -27,8 +27,15 @@ static char *join_path(char *dir, char *cmd)
 
 static char *find_direct_path(char *cmd)
 {
+	struct stat	st;
+
 	if (access(cmd, F_OK) != 0)
 		return (NULL);
+	if (stat(cmd, &st) == 0 && S_ISDIR(st.st_mode))
+	{
+		errno = EISDIR;
+		return (NULL);
+	}
 	if (access(cmd, X_OK) != 0)
 		return (NULL);
 	return (ft_strdup(cmd));

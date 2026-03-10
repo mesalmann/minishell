@@ -50,6 +50,11 @@ static void child_run_cmd(t_ctx *ctx, t_cmdnode *cmd)
     {
         ft_putstr_fd("minishell: ", STDERR_FILENO);
         ft_putstr_fd(cmd->argv[0], STDERR_FILENO);
+        if (errno == EISDIR)
+        {
+            ft_putendl_fd(": Is a directory", STDERR_FILENO);
+            _exit(126);
+        }
         if (errno == EACCES)
         {
             ft_putendl_fd(": Permission denied", STDERR_FILENO);

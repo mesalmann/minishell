@@ -47,7 +47,12 @@ static void exec_cmd_not_found(t_ctx *ctx, char *name)
 {
     ft_putstr_fd("minishell: ", 2);
     ft_putstr_fd(name, 2);
-    if (errno == EACCES)
+    if (errno == EISDIR)
+    {
+        ft_putendl_fd(": Is a directory", 2);
+        ctx->last_status = 126;
+    }
+    else if (errno == EACCES)
     {
         ft_putendl_fd(": Permission denied", 2);
         ctx->last_status = 126;

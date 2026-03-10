@@ -57,26 +57,46 @@ static bool	is_quoted_word(const char *s)
 	return (false);
 }
 
+static void	strip_copy(const char *s, char *out, int *k)
+{
+	t_qstate	st;
+	int			i;
+
+	st = Q_NONE;
+	i = 0;
+	while (s[i])
+	{
+		if (st == Q_NONE && s[i] == '\'')
+			st = Q_SINGLE;
+		else if (st == Q_NONE && s[i] == '"')
+			st = Q_DOUBLE;
+		else if (st == Q_SINGLE && s[i] == '\'')
+			st = Q_NONE;
+		else if (st == Q_DOUBLE && s[i] == '"')
+			st = Q_NONE;
+		else if (out)
+			out[(*k)++] = s[i];
+		else
+			(*k)++;
+		i++;
+	}
+}
+
 static char	*strip_delim_quotes(const char *s)
 {
 	char	*out;
-	int		i;
-	int		k;
+	int		len;
 
 	if (!s)
 		return (NULL);
-	out = malloc(ft_strlen(s) + 1);
+	len = 0;
+	strip_copy(s, NULL, &len);
+	out = malloc((size_t)len + 1);
 	if (!out)
 		return (NULL);
-	i = 0;
-	k = 0;
-	while (s[i])
-	{
-		if (s[i] != '\'' && s[i] != '"')
-			out[k++] = s[i];
-		i++;
-	}
-	out[k] = '\0';
+	len = 0;
+	strip_copy(s, out, &len);
+	out[len] = '\0';
 	return (out);
 }
 
