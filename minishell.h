@@ -110,6 +110,7 @@ typedef struct s_ctx
 	bool env_dirty;
 	int last_status;
 	bool interactive;
+	bool exit_requested;
 } t_ctx;
 
 typedef struct s_expbuf

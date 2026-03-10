@@ -3,7 +3,7 @@ export asd="asdasd" | asdas="asfas" | şşşşşşşşş="asdasdscv"  // ANLAMAD
 minishell$ echo $asdasd 124124 //HALLEDİLDİ
  124124
 
-cat << EOF | cat > asd.txt | cat > basd.txt
+cat << EOF | cat > asd.txt | cat > basd.txt // exit ile çıkarken still reachble yiyorduk onu tamamen halletik kardeşim.
 
 cat << ""'""'a'""'""
 

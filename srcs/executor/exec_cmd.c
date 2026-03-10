@@ -34,10 +34,9 @@ static void exec_builtin_simple(t_ctx *ctx, t_cmdnode *cmd)
 
     if (ret == -1)
     {
-        ms_restore_stdio(saved_in, saved_out);  
-        ms_ctx_destroy(ctx);
-        rl_clear_history();
-        exit(ctx->last_status);
+        ms_restore_stdio(saved_in, saved_out);
+        ctx->exit_requested = true;
+        return;
     }
     
     ctx->last_status = ret;

@@ -97,6 +97,8 @@ void ms_loop(t_ctx *ctx, char **envp)
 		}
 		ms_process_line(ctx, line);
 		free(line);
+		if (ctx->exit_requested)
+			break ;
 	}
 }
 
@@ -111,5 +113,6 @@ int main(int ac, char **av, char **envp)
 		return (1);
 	ms_loop(&ctx, envp);
 	ms_ctx_destroy(&ctx);
+	rl_clear_history();
 	return (ctx.last_status);
 }
