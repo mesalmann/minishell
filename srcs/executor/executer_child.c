@@ -43,6 +43,29 @@ static void	child_exit(t_ctx *ctx, char *path, int code)
     _exit(code);
 }
 
+static void	exec_sh_fallback(char **argv, char **envp)
+{
+	char	**nargv;
+	int		argc;
+	int		i;
+
+	argc = 0;
+	while (argv[argc])
+		argc++;
+	nargv = malloc(sizeof(char *) * (argc + 2));
+	if (!nargv)
+		return ;
+	nargv[0] = "/bin/sh";
+	i = 0;
+	while (i <= argc)
+	{
+		nargv[i + 1] = argv[i];
+		i++;
+	}
+	execve("/bin/sh", nargv, envp);
+	free(nargv);
+}
+
 static void child_run_cmd(t_ctx *ctx, t_cmdnode *cmd)
 {
     char		*path;
@@ -72,6 +95,8 @@ static void child_run_cmd(t_ctx *ctx, t_cmdnode *cmd)
             ft_putendl_fd(": Is a directory", STDERR_FILENO);
         else if (errno == EACCES)
             ft_putendl_fd(": Permission denied", STDERR_FILENO);
+        else if (ft_strchr(cmd->argv[0], '/'))
+            ft_putendl_fd(": No such file or directory", STDERR_FILENO);
         else
             ft_putendl_fd(": command not found", STDERR_FILENO);
         child_exit(ctx, NULL, (errno == ENOENT) ? 127 : 126);
@@ -89,6 +114,8 @@ static void child_run_cmd(t_ctx *ctx, t_cmdnode *cmd)
     cmd->next = NULL;
     ctx->cur_ast = NULL;
     execve(path, cmd->argv, ctx->envp_cache);
+    if (errno == ENOEXEC)
+        exec_sh_fallback(cmd->argv, ctx->envp_cache);
     perror("minishell");
     ms_cmd_free(cmd);
     child_exit(ctx, path, 126);
@@ -126,6 +153,14 @@ static int fork_handle_error(pid_t *pids, int done, int *pipes, int n)
     return (0);
 }
 
+static void	parent_close_used_ends(int *pipes, int n, int i)
+{
+	if (i < n - 1)
+		close(pipes[i * 2 + 1]);
+	if (i > 0)
+		close(pipes[(i - 1) * 2]);
+}
+
 int ms_create_pipeline(t_ctx *ctx, t_cmdnode *pl, int *pipes, pid_t *pids)
 {
     t_cmdnode *cmd;
@@ -149,6 +184,7 @@ int ms_create_pipeline(t_ctx *ctx, t_cmdnode *pl, int *pipes, pid_t *pids)
             free(pids);
             child_run_cmd(ctx, cmd);
         }
+        parent_close_used_ends(pipes, n, i);
         cmd = cmd->next;
         i++;
     }

@@ -57,11 +57,39 @@ static void exec_cmd_not_found(t_ctx *ctx, char *name)
         ft_putendl_fd(": Permission denied", 2);
         ctx->last_status = 126;
     }
+    else if (ft_strchr(name, '/'))
+    {
+        ft_putendl_fd(": No such file or directory", 2);
+        ctx->last_status = 127;
+    }
     else
     {
         ft_putendl_fd(": command not found", 2);
         ctx->last_status = 127;
     }
+}
+
+static void	exec_sh_fallback(char **argv, char **envp)
+{
+	char	**nargv;
+	int		argc;
+	int		i;
+
+	argc = 0;
+	while (argv[argc])
+		argc++;
+	nargv = malloc(sizeof(char *) * (argc + 2));
+	if (!nargv)
+		return ;
+	nargv[0] = "/bin/sh";
+	i = 0;
+	while (i <= argc)
+	{
+		nargv[i + 1] = argv[i];
+		i++;
+	}
+	execve("/bin/sh", nargv, envp);
+	free(nargv);
 }
 
 static void exec_child_process(t_ctx *ctx, t_cmdnode *cmd, char *path)
@@ -90,6 +118,8 @@ static void exec_child_process(t_ctx *ctx, t_cmdnode *cmd, char *path)
         ctx->cur_tokens = NULL;
     }
     execve(path, cmd->argv, ctx->envp_cache);
+    if (errno == ENOEXEC)
+        exec_sh_fallback(cmd->argv, ctx->envp_cache);
     perror("minishell");
     if (ctx->cur_ast)
     {
