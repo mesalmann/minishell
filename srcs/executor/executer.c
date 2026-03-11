@@ -87,6 +87,22 @@ static void ms_exec_pipeline_multi(t_ctx *ctx, t_cmdnode *pipeline)
 	free(pids);
 }
 
+static void	ms_update_underscore(t_ctx *ctx, t_cmdnode *pipeline)
+{
+	t_cmdnode	*last;
+	int			i;
+
+	last = pipeline;
+	while (last->next)
+		last = last->next;
+	if (!last->argv || !last->argv[0])
+		return ;
+	i = 0;
+	while (last->argv[i + 1])
+		i++;
+	ms_env_set(ctx, "_", last->argv[i], true);
+}
+
 void ms_execute_pipeline(t_ctx *ctx, t_cmdnode *pipeline)
 {
 	if (!pipeline)
@@ -99,7 +115,9 @@ void ms_execute_pipeline(t_ctx *ctx, t_cmdnode *pipeline)
 	if (!pipeline->next)
 	{
 		ms_exec_simple(ctx, pipeline);
+		ms_update_underscore(ctx, pipeline);
 		return;
 	}
 	ms_exec_pipeline_multi(ctx, pipeline);
+	ms_update_underscore(ctx, pipeline);
 }

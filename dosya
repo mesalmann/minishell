@@ -7,13 +7,8 @@ cat << ""'""'a'""'""  // kardeşim bu da halledildi, normal bashte ki gibi 2 çi
 $HOME // normalde Permission denied hatası veriyordu hata kontrolü acces ile falan detaylı hata kontrolü yapmamıştık. Halledildi. 
 exit // direk exit fonksiyonumuz  problemliydi halledildi. 
 exit | exit // çift exit exit yazdırıyordu halledildi. 
-minishell$ export X=minishell$ cat << $Xminishell$ echo $?minishell$ cat << $Xminishell$ cat << "$X // burada heredoc çalışmıyrdu halledildi. 
-
-pwd | pwd
-
-builtinleri childda çalıştırma
-
-hdere@k1m02s06:/sgoinfre/hdere/minishell$ echo '$USER'
+minishell$ export X=minishell$ cat << $Xminishell$ echo $?minishell$ cat << $Xminishell$ cat << "$X // burada heredoc çalışmıyrdu halledildi.
+/*hdere@k1m02s06:/sgoinfre/hdere/minishell$ echo '$USER'
 echo "$USER"
 echo "$USER$HOME"
 echo "'$USER'"
@@ -26,29 +21,37 @@ hdere/home/hdere
 'hdere'
 "$USER"
 hdere$HOME
-hdere$HOME
-hdere@k1m02s06:/sgoinfre/hdere/minishell$ echo "$USER"'$HOME'
+hdere$HOME*/  Bu kısım zaten dün tırnakları halledilince otomatik olarak halledilmiş oldu. 
+hdere@k1m02s06:/sgoinfre/hdere/minishell$ echo "$USER"'$HOME'   //Burada ki çok önemli olan neydi hatırlamamak ama doğru çıktı veriyor. 
 önemli bi nokta! mervenin aklına gelecek (ayn knk)
-
-
-
-
-minishell$ echo $1
-
+minishell$ echo $1  // bu zaten tam olarak böyle çalışmalı kardeşim ondan bu
 minishell$ echo $123
 23
-
-
-
-
-minishell$ echo $_
-/usr/bin/valgrind
-minishell$ 
-
-
 minishell$ echo hello > a.txt
 cat a.txt
-echo world > a.txt
+echo world > a.txt                           // bu kısımda halledildi düzgün çalışıyor
 cat a.txt
 minishell$ 
-burada toplu çalışıyor 
+burada toplu çalışıyor  
+minishell$ echo $_
+/usr/bin/valgrind                //// bu kısımda eklendi 
+minishell$ 
+
+pwd | pwd
+
+builtinleri childda çalıştırma
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
