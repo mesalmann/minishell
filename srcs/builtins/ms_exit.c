@@ -13,6 +13,11 @@
 #include "../../minishell.h"
 #include <limits.h>
 
+static int	is_ws(char c)
+{
+	return (c == ' ' || (c >= 9 && c <= 13));
+}
+
 static int	parse_exit_code(const char *s, long long *res)
 {
 	int					i;
@@ -23,12 +28,12 @@ static int	parse_exit_code(const char *s, long long *res)
 	i = 0;
 	neg = 0;
 	u_res = 0;
-	while (s[i] == ' ' || (s[i] >= 9 && s[i] <= 13))
+	while (is_ws(s[i]))
 		i++;
 	if (s[i] == '-' || s[i] == '+')
 		if (s[i++] == '-')
 			neg = 1;
-	if (!s[i])
+	if (!(s[i] >= '0' && s[i] <= '9'))
 		return (1);
 	cutoff = (unsigned long long)LLONG_MAX + neg;
 	while (s[i] >= '0' && s[i] <= '9')
@@ -37,6 +42,8 @@ static int	parse_exit_code(const char *s, long long *res)
 			return (1);
 		u_res = u_res * 10 + (s[i++] - '0');
 	}
+	while (is_ws(s[i]))
+		i++;
 	if (s[i] != '\0')
 		return (1);
 	*res = (neg) ? -(long long)u_res : (long long)u_res;

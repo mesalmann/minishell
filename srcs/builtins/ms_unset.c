@@ -12,6 +12,14 @@
 
 #include "minishell.h"
 
+static int	unset_invalid_opt(const char *arg)
+{
+	ft_putstr_fd("minishell: unset: -", STDERR_FILENO);
+	write(STDERR_FILENO, &arg[1], 1);
+	ft_putendl_fd(": invalid option", STDERR_FILENO);
+	return (2);
+}
+
 int	ms_builtin_unset(t_ctx *ctx, char **argv)
 {
 	int	i;
@@ -21,14 +29,9 @@ int	ms_builtin_unset(t_ctx *ctx, char **argv)
 	i = 1;
 	while (argv[i])
 	{
-		if (!ms_is_valid_identifier(argv[i]))
-		{
-			ft_putstr_fd("minishell: unset: `", STDERR_FILENO);
-			ft_putstr_fd(argv[i], STDERR_FILENO);
-			ft_putendl_fd("': not a valid identifier", STDERR_FILENO);
-			ret = 1;
-		}
-		else
+		if (argv[i][0] == '-' && argv[i][1])
+			ret = unset_invalid_opt(argv[i]);
+		else if (ms_is_valid_identifier(argv[i]))
 			ms_env_unset(ctx, argv[i]);
 		i++;
 	}
