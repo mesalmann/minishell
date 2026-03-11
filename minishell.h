@@ -111,6 +111,8 @@ typedef struct s_ctx
 	int last_status;
 	bool interactive;
 	bool exit_requested;
+	t_token *cur_tokens;
+	struct s_cmdnode *cur_ast;
 } t_ctx;
 
 typedef struct s_expbuf

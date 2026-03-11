@@ -121,4 +121,14 @@ void ms_ctx_destroy(t_ctx *ctx)
 	ctx->env = NULL;
 	free_tab(ctx->envp_cache);
 	ctx->envp_cache = NULL;
+	if (ctx->cur_ast)
+	{
+		ms_cmd_free_list(ctx->cur_ast);
+		ctx->cur_ast = NULL;
+	}
+	if (ctx->cur_tokens)
+	{
+		ms_token_free(ctx->cur_tokens);
+		ctx->cur_tokens = NULL;
+	}
 }

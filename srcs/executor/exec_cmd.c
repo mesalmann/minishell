@@ -64,17 +64,39 @@ static void exec_cmd_not_found(t_ctx *ctx, char *name)
     }
 }
 
-static void exec_child_process(t_cmdnode *cmd, char *path, char **envp)
+static void exec_child_process(t_ctx *ctx, t_cmdnode *cmd, char *path)
 {
     signal(SIGINT, SIG_DFL);
     signal(SIGQUIT, SIG_DFL);
     if (!ms_apply_redirs(cmd, NULL, NULL))
     {
+        if (ctx->cur_tokens)
+        {
+            ms_token_free(ctx->cur_tokens);
+            ctx->cur_tokens = NULL;
+        }
+        if (ctx->cur_ast)
+        {
+            ms_cmd_free_list(ctx->cur_ast);
+            ctx->cur_ast = NULL;
+        }
+        ms_ctx_destroy(ctx);
         free(path);
         _exit(1);
     }
-    execve(path, cmd->argv, envp);
+    if (ctx->cur_tokens)
+    {
+        ms_token_free(ctx->cur_tokens);
+        ctx->cur_tokens = NULL;
+    }
+    execve(path, cmd->argv, ctx->envp_cache);
     perror("minishell");
+    if (ctx->cur_ast)
+    {
+        ms_cmd_free_list(ctx->cur_ast);
+        ctx->cur_ast = NULL;
+    }
+    ms_ctx_destroy(ctx);
     free(path);
     _exit(126);
 }
@@ -134,7 +156,7 @@ void ms_exec_simple(t_ctx *ctx, t_cmdnode *cmd)
     }
     pid = fork();
     if (pid == 0)
-        exec_child_process(cmd, path, ctx->envp_cache);
+        exec_child_process(ctx, cmd, path);
     else
         exec_parent_wait(ctx, pid, path);
 }

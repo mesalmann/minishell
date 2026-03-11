@@ -35,12 +35,13 @@ minishell$
 burada toplu çalışıyor  
 minishell$ echo $_
 /usr/bin/valgrind                //// bu kısımda eklendi 
-minishell$ 
-
-pwd | pwd
-
+minishell$
+pwd | pwd // çalışıyor kardeşim artık
 builtinleri childda çalıştırma
-
+minishell$ yes | head -n 1  // güzel çalışıyor
+y
+leakler tamamen halledildi.
+$ yapısı halledildi.
 
 
 

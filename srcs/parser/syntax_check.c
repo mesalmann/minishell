@@ -61,7 +61,15 @@ bool	ms_syntax_validate(t_token *tokens, t_ctx *ctx)
 		if (!curr->next)
 			return (syntax_err(ctx, NULL));
 		if (curr->next->kind == TK_OP)
+		{
+			if (curr->op == OP_PIPE
+				&& ms_is_redir_or_heredoc(curr->next->op))
+			{
+				curr = curr->next;
+				continue ;
+			}
 			return (syntax_err(ctx, curr->next));
+		}
 		curr = curr->next;
 	}
 	return (true);
