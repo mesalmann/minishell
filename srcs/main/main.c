@@ -70,8 +70,6 @@ static void	ms_process_line(t_ctx *ctx, char *line)
 
 static int	ms_event_hook(void)
 {
-	if (g_sig == SIGINT)
-		rl_done = 1;
 	return (0);
 }
 
@@ -83,15 +81,13 @@ void ms_loop(t_ctx *ctx, char **envp)
 	rl_event_hook = ms_event_hook;
 	while (1)
 	{
+		line = readline("minishell$ ");
 		if (g_sig == SIGINT)
 		{
 			ctx->last_status = 130;
 			g_sig = 0;
-		}
-		line = readline("minishell$ ");
-		if (g_sig == SIGINT)
-		{
-			free(line);
+			if (line)
+				free(line);
 			continue ;
 		}
 		if (line == NULL)
