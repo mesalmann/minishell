@@ -44,6 +44,8 @@ static int hd_process_input(t_ctx *ctx, t_heredoc *h)
     line = readline("> ");
     if (g_sig == SIGINT)
     {
+        rl_on_new_line();
+        rl_replace_line("", 0);
         free(line);
         g_sig = 0;
         return (-1);

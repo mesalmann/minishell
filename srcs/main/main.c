@@ -59,7 +59,10 @@ static void	ms_process_line(t_ctx *ctx, char *line)
 static int	ms_event_hook(void)
 {
 	if (g_sig == SIGINT)
+	{
+		rl_replace_line("", 0);
 		rl_done = 1;
+	}
 	return (0);
 }
 
@@ -79,6 +82,8 @@ void ms_loop(t_ctx *ctx, char **envp)
 		line = readline("minishell$ ");
 		if (g_sig == SIGINT)
 		{
+			rl_replace_line("", 0);
+			g_sig = 0;
 			free(line);
 			continue ;
 		}
@@ -109,6 +114,7 @@ int main(int ac, char **av, char **envp)
 	ms_sig_install_interactive();
 	if (ms_ctx_init(&ctx, envp) == false)
 		return (1);
+	rl_catch_signals = 0;
 	ms_loop(&ctx, envp);
 	ms_ctx_destroy(&ctx);
 	rl_clear_history();
