@@ -15,14 +15,35 @@
 int ms_builtin_env(t_ctx *ctx, char **argv)
 {
 	t_envnode	*node;
+	char		*eq;
+	char		*key;
+	char		*val;
 
 	if (argv && argv[1])
 	{
-        ft_putstr_fd("env: '", STDERR_FILENO);
-        ft_putstr_fd(argv[1], STDERR_FILENO);
-        ft_putendl_fd("': No such file or directory", STDERR_FILENO);
-        return (127); 
-    
+		eq = ft_strchr(argv[1], '=');
+		if (eq)
+		{
+			key = ft_substr(argv[1], 0, (unsigned int)(eq - argv[1]));
+			if (!key)
+				return (-1);
+			val = ft_strdup(eq + 1);
+			if (!val)
+			{
+				free(key);
+				return (-1);
+			}
+			ms_env_set(ctx, key, val, true);
+			free(key);
+			free(val);
+		}
+		else
+		{
+			ft_putstr_fd("env: '", STDERR_FILENO);
+			ft_putstr_fd(argv[1], STDERR_FILENO);
+			ft_putendl_fd("': No such file or directory", STDERR_FILENO);
+			return (127);
+		}
 	}
 	
 	node = ctx->env;
