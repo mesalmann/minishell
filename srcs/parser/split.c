@@ -76,7 +76,13 @@ char	**ft_split(char const *s, char c)
 			index = i;
 		else if ((s[i] == c || i == ft_strlen(s)) && index >= 0)
 		{
-			split[j++] = word_dup(s, index, i);
+			split[j] = word_dup(s, index, i);
+			if (!split[j])
+			{
+				free_tab(split);
+				return (NULL);
+			}
+			j++;
 			index = -1;
 		}
 		i++;

@@ -94,8 +94,7 @@ static void	exec_sh_fallback(char **argv, char **envp)
 
 static void exec_child_process(t_ctx *ctx, t_cmdnode *cmd, char *path)
 {
-    signal(SIGINT, SIG_DFL);
-    signal(SIGQUIT, SIG_DFL);
+    ms_sig_child_reset();
     if (!ms_apply_redirs(cmd, NULL, NULL))
     {
         if (ctx->cur_tokens)
@@ -147,7 +146,10 @@ static void exec_parent_wait(t_ctx *ctx, pid_t pid, char *path)
     if (WIFEXITED(status))
         ctx->last_status = WEXITSTATUS(status);
     else if (WIFSIGNALED(status))
+    {
         ctx->last_status = 128 + WTERMSIG(status);
+        ms_print_signal_msg(status);
+    }
     free(path);
 }
 
@@ -184,9 +186,11 @@ void ms_exec_simple(t_ctx *ctx, t_cmdnode *cmd)
         exec_cmd_not_found(ctx, cmd->argv[0]);
         return;
     }
+    ms_sig_install_exec();
     pid = fork();
     if (pid == 0)
         exec_child_process(ctx, cmd, path);
     else
         exec_parent_wait(ctx, pid, path);
+    ms_sig_install_interactive();
 }

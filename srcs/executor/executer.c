@@ -53,7 +53,10 @@ static void	wait_children(t_ctx *ctx, pid_t *pids, int n)
 			if (WIFEXITED(status))
 				ctx->last_status = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status))
+			{
 				ctx->last_status = 128 + WTERMSIG(status);
+				ms_print_signal_msg(status);
+			}
 		}
 		i++;
 	}
@@ -75,14 +78,16 @@ static void ms_exec_pipeline_multi(t_ctx *ctx, t_cmdnode *pipeline)
 		ctx->last_status = 1;
 		return;
 	}
+	ms_sig_install_exec();
 	if (!ms_create_pipeline(ctx, pipeline, pipes, pids))
 	{
+		ms_sig_install_interactive();
 		free(pipes);
 		free(pids);
 		return;
 	}
-	ms_close_all_pipes(pipes, n - 1);
 	wait_children(ctx, pids, n);
+	ms_sig_install_interactive();
 	free(pipes);
 	free(pids);
 }

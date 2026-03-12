@@ -19,7 +19,7 @@ static bool write_hd_line(t_ctx *ctx, t_heredoc *h, char *line)
 
     if (h->expand_mode)
     {
-        expanded = ms_expand_str(ctx, line, false);
+        expanded = ms_expand_str(ctx, line, true);
         if (!expanded)
             return (false);
         len = ft_strlen(expanded);
@@ -116,10 +116,10 @@ bool ms_apply_heredoc_redir(t_cmdnode *cmd)
     return (ok);
 }
 
-bool ms_run_heredocs(t_ctx *ctx, t_cmdnode *pipeline)
+static void	hd_close_open_pipes(t_cmdnode *pipeline)
 {
-    t_cmdnode *cmd;
-    t_heredoc *h;
+    t_cmdnode	*cmd;
+    t_heredoc	*h;
 
     cmd = pipeline;
     while (cmd)
@@ -127,11 +127,50 @@ bool ms_run_heredocs(t_ctx *ctx, t_cmdnode *pipeline)
         h = cmd->heredocs;
         while (h)
         {
-            if (!read_one_heredoc(ctx, h))
-                return (false);
+            if (h->pipe_rd >= 0)
+            {
+                close(h->pipe_rd);
+                h->pipe_rd = -1;
+            }
+            if (h->pipe_wr >= 0)
+            {
+                close(h->pipe_wr);
+                h->pipe_wr = -1;
+            }
             h = h->next;
         }
         cmd = cmd->next;
     }
+}
+
+bool ms_run_heredocs(t_ctx *ctx, t_cmdnode *pipeline)
+{
+    t_cmdnode *cmd;
+    t_heredoc *h;
+    int        saved_stdin;
+
+    saved_stdin = dup(STDIN_FILENO);
+    ms_sig_install_heredoc();
+    cmd = pipeline;
+    while (cmd)
+    {
+        h = cmd->heredocs;
+        while (h)
+        {
+            if (!read_one_heredoc(ctx, h))
+            {
+                hd_close_open_pipes(pipeline);
+                dup2(saved_stdin, STDIN_FILENO);
+                close(saved_stdin);
+                ms_sig_install_interactive();
+                return (false);
+            }
+            h = h->next;
+        }
+        cmd = cmd->next;
+    }
+    dup2(saved_stdin, STDIN_FILENO);
+    close(saved_stdin);
+    ms_sig_install_interactive();
     return (true);
 }

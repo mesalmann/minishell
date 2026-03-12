@@ -14,29 +14,6 @@
 
 volatile sig_atomic_t g_sig = 0;
 
-static void handle_sigint(int sig)
-{
-	(void)sig;
-	write(1, "\n", 1);
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	if (g_sig != 1) 
-        rl_redisplay();
-	g_sig = SIGINT;
-}
-
-void ms_sig_install_interactive(void)
-{
-	struct sigaction sa;
-
-	sa.sa_flags = 0;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_handler = handle_sigint;
-	sigaction(SIGINT, &sa, NULL);
-	sa.sa_handler = SIG_IGN;
-	sigaction(SIGQUIT, &sa, NULL);
-}
-
 static void	ms_process_line(t_ctx *ctx, char *line)
 {
 	t_token		*tokens;
@@ -46,29 +23,44 @@ static void	ms_process_line(t_ctx *ctx, char *line)
 	tokens = ms_tokenize(line, ctx);
 	if (!tokens)
 		return ;
+	ctx->cur_tokens = tokens;
 	if (!ms_syntax_validate(tokens, ctx))
 	{
 		ms_token_free(tokens);
+		ctx->cur_tokens = NULL;
 		return ;
 	}
 	if (!ms_expand_tokens(&tokens, ctx))
 	{
 		ctx->last_status = 1;
 		ms_token_free(tokens);
+		ctx->cur_tokens = NULL;
 		return ;
 	}
+	ctx->cur_tokens = tokens;
 	if (!tokens)
 	{
 		ctx->last_status = 0;
+		ctx->cur_tokens = NULL;
 		return ;
 	}
 	ast = ms_parse(tokens, ctx);
+	ctx->cur_ast = ast;
 	if (ast)
 	{
 		ms_execute_pipeline(ctx, ast);
 		ms_cmd_free_list(ast);
 	}
+	ctx->cur_ast = NULL;
 	ms_token_free(tokens);
+	ctx->cur_tokens = NULL;
+}
+
+static int	ms_event_hook(void)
+{
+	if (g_sig == SIGINT)
+		rl_done = 1;
+	return (0);
 }
 
 void ms_loop(t_ctx *ctx, char **envp)
@@ -76,6 +68,7 @@ void ms_loop(t_ctx *ctx, char **envp)
 	char *line;
 
 	(void)envp;
+	rl_event_hook = ms_event_hook;
 	while (1)
 	{
 		if (g_sig == SIGINT)
@@ -84,6 +77,11 @@ void ms_loop(t_ctx *ctx, char **envp)
 			g_sig = 0;
 		}
 		line = readline("minishell$ ");
+		if (g_sig == SIGINT)
+		{
+			free(line);
+			continue ;
+		}
 		if (line == NULL)
 		{
 			if (ctx->interactive)

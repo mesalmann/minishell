@@ -45,6 +45,7 @@ SRCS = \
 	srcs/parser/parser_free.c \
 	srcs/executor/redirs.c \
 	srcs/executor/redirs_heredoc.c \
+	srcs/signals/signals.c \
 	srcs/env/env.c \
 	srcs/env/env_build.c
 

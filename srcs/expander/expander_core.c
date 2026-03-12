@@ -78,14 +78,13 @@ char *ms_expand_str(t_ctx *ctx, const char *in, bool in_dquote)
 {
     t_expbuf eb;
 
-    (void)in_dquote;
     ft_memset(&eb, 0, sizeof(t_expbuf));
     if (!ms_sb_grow(&eb.out, &eb.cap, 1))
         return (NULL);
     eb.out[0] = '\0';
     while (in && in[eb.i])
     {
-        if (handle_quote_toggle(&eb, in[eb.i]))
+        if (!in_dquote && handle_quote_toggle(&eb, in[eb.i]))
             continue;
         if (in[eb.i] == '$' && eb.st != Q_SINGLE)
         {

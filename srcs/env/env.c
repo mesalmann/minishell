@@ -61,8 +61,8 @@ static bool env_update_node(t_envnode *nd, const char *val, bool hv, t_ctx *c)
 			return (false);
 		free(nd->val);
 		nd->val = new_val;
+		nd->has_val = true;
 	}
-	nd->has_val = hv;
 	c->env_dirty = true;
 	return (true);
 }

@@ -167,6 +167,10 @@ bool ms_env_set(t_ctx *ctx, const char *key, const char *val,
 bool ms_env_unset(t_ctx *ctx, const char *key);
 char **ms_env_build_envp(t_ctx *ctx);
 void ms_sig_install_interactive(void);
+void ms_sig_install_exec(void);
+void ms_sig_install_heredoc(void);
+void ms_sig_child_reset(void);
+void ms_print_signal_msg(int status);
 t_token *ms_tokenize(const char *line, t_ctx *ctx);
 void ms_token_free(t_token *toks);
 bool ms_syntax_validate(t_token *tokens, t_ctx *ctx);

@@ -14,8 +14,7 @@
 
 static void child_setup_io(int *pipes, int n, int i)
 {
-    signal(SIGINT, SIG_DFL);
-    signal(SIGQUIT, SIG_DFL);
+    ms_sig_child_reset();
     if (i > 0)
         dup2(pipes[(i - 1) * 2], STDIN_FILENO);
     if (i < n - 1)
@@ -66,6 +65,31 @@ static void	exec_sh_fallback(char **argv, char **envp)
 	free(nargv);
 }
 
+static void	close_other_heredoc_fds(t_ctx *ctx, t_cmdnode *my_cmd)
+{
+	t_cmdnode	*iter;
+	t_heredoc	*hd;
+
+	if (!ctx || !ctx->cur_ast)
+		return ;
+	iter = ctx->cur_ast;
+	while (iter)
+	{
+		if (iter != my_cmd)
+		{
+			hd = iter->heredocs;
+			while (hd)
+			{
+				if (hd->pipe_rd >= 0)
+					close(hd->pipe_rd);
+				hd->pipe_rd = -1;
+				hd = hd->next;
+			}
+		}
+		iter = iter->next;
+	}
+}
+
 static void child_run_cmd(t_ctx *ctx, t_cmdnode *cmd)
 {
     char		*path;
@@ -76,6 +100,7 @@ static void child_run_cmd(t_ctx *ctx, t_cmdnode *cmd)
 
     if (!cmd->argv || !cmd->argv[0])
         child_exit(ctx, NULL, 0);
+    close_other_heredoc_fds(ctx, cmd);
     if (!ms_apply_redirs(cmd, NULL, NULL))
         child_exit(ctx, NULL, 1);
     if (ms_is_builtin_argv(cmd->argv))

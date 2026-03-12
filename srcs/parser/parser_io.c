@@ -25,6 +25,7 @@ static bool parse_one_redir(t_cmdnode *cmd, t_token **t)
 {
     t_redirtype rt;
     t_redir *r;
+    char *target;
 
     rt = RD_IN;
     if ((*t)->op == OP_OUT_TRUNC)
@@ -34,11 +35,13 @@ static bool parse_one_redir(t_cmdnode *cmd, t_token **t)
     *t = (*t)->next;
     if (!*t || (*t)->kind != TK_WORD)
         return (false);
-    r = ms_redir_new(rt, ft_strdup((*t)->lex));
-    if (!r || !r->target)
+    target = ft_strdup((*t)->lex);
+    if (!target)
+        return (false);
+    r = ms_redir_new(rt, target);
+    if (!r)
     {
-        if (r)
-            free(r);
+        free(target);
         return (false);
     }
     ms_redir_add_back(&cmd->redirs, r);
