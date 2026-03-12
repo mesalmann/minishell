@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "executor_internal.h"
 
 static void child_setup_io(int *pipes, int n, int i)
 {
@@ -42,7 +42,7 @@ static void	child_exit(t_ctx *ctx, char *path, int code)
     _exit(code);
 }
 
-static void	exec_sh_fallback(char **argv, char **envp)
+void	exec_sh_fallback(char **argv, char **envp)
 {
 	char	**nargv;
 	int		argc;

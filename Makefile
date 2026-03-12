@@ -2,7 +2,7 @@ NAME = minishell
 CC = cc
 
 # Normal build flags
-CFLAGS = -Wall -Wextra -Werror -g -I. -I/opt/homebrew/opt/readline/include
+CFLAGS = -Wall -Wextra -Werror -g -Iincludes -I/opt/homebrew/opt/readline/include
 LDFLAGS = -L/opt/homebrew/opt/readline/lib
 LDLIBS = -lreadline -lhistory -lncurses
 
@@ -17,7 +17,6 @@ SRCS = \
 	srcs/parser/split.c \
 	srcs/utils/utils.c \
 	srcs/utils/utils2.c \
-	srcs/utils/utils3.c \
 	srcs/executor/executer.c \
 	srcs/executor/executer_child.c \
 	srcs/builtins/builtins_utils.c \
@@ -33,7 +32,6 @@ SRCS = \
 	srcs/lexer/lexer_tokens.c \
 	srcs/lexer/lexer_word.c \
 	srcs/lexer/lexer_operator.c \
-	srcs/lexer/lexer_quote.c \
 	srcs/parser/syntax_check.c \
 	srcs/expander/expander_core.c \
 	srcs/expander/expander_vars.c \

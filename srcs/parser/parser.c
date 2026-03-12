@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "parser_internal.h"
 
 static t_token *skip_to_pipe(t_token *toks)
 {

@@ -10,8 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../minishell.h"
-#include <string.h>
+#include "minishell.h"
 
 int	ms_is_builtin_argv(char **argv)
 {
@@ -53,32 +52,4 @@ int	ms_builtin_run_argv(t_ctx *ctx, char **argv)
 	if (strcmp(argv[0], "exit") == 0)
 		return (ms_builtin_exit(ctx, argv));
 	return (1);
-}
-
-t_bltin	ms_builtin_kind(const char *name)
-{
-	if (!name)
-		return (BI_NONE);
-	if (strcmp(name, "echo") == 0)
-		return (BI_ECHO);
-	if (strcmp(name, "pwd") == 0)
-		return (BI_PWD);
-	if (strcmp(name, "env") == 0)
-		return (BI_ENV);
-	if (strcmp(name, "export") == 0)
-		return (BI_EXPORT);
-	if (strcmp(name, "unset") == 0)
-		return (BI_UNSET);
-	if (strcmp(name, "cd") == 0)
-		return (BI_CD);
-	if (strcmp(name, "exit") == 0)
-		return (BI_EXIT);
-	return (BI_NONE);
-}
-
-int	ms_builtin_run(t_ctx *ctx, t_cmdnode *cmd)
-{
-	if (!cmd || !cmd->argv || !cmd->argv[0])
-		return (1);
-	return (ms_builtin_run_argv(ctx, cmd->argv));
 }

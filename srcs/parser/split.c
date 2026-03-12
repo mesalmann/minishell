@@ -19,7 +19,7 @@ static int	is_sep(char s, char c)
 	return (0);
 }
 
-int	count_words(char const *s, char c)
+static int	count_words(char const *s, char c)
 {
 	int	i;
 	int	count;

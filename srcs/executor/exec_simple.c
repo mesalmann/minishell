@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "executor_internal.h"
 
 static char *join_path(char *dir, char *cmd)
 {

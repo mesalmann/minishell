@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "executor_internal.h"
 
 int	ms_count_cmds(t_cmdnode *cmd)
 {

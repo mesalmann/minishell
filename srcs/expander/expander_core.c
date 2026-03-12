@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "expander_internal.h"
 
 static bool expand_var_name(t_ctx *ctx, t_expbuf *eb, const char *in)
 {
@@ -103,24 +103,4 @@ char *ms_expand_str(t_ctx *ctx, const char *in, bool in_dquote)
         eb.i++;
     }
     return (eb.out);
-}
-
-bool ms_expand_argv(t_ctx *ctx, char ***argv_io)
-{
-    int i;
-    char *new;
-
-    if (!argv_io || !*argv_io)
-        return (true);
-    i = 0;
-    while ((*argv_io)[i])
-    {
-        new = ms_expand_str(ctx, (*argv_io)[i], false);
-        if (!new)
-            return (false);
-        free((*argv_io)[i]);
-        (*argv_io)[i] = new;
-        i++;
-    }
-    return (true);
 }

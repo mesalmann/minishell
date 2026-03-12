@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "parser_internal.h"
 
 bool ms_is_redir_or_heredoc(t_opkind op)
 {

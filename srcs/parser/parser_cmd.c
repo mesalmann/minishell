@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "parser_internal.h"
 
 t_cmdnode *ms_cmd_new(void)
 {

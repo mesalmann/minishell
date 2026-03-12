@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "expander_internal.h"
 
 bool ms_sb_grow(char **buf, size_t *cap, size_t need)
 {

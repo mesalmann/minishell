@@ -10,7 +10,7 @@
 /* */
 /* ************************************************************************** */
 
-#include "../../minishell.h"
+#include "minishell.h"
 #include <limits.h>
 
 static int	is_ws(char c)

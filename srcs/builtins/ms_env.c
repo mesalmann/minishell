@@ -10,7 +10,7 @@
 /*                                                                        	    */
 /* ************************************************************************** */
 
-#include "../../minishell.h"
+#include "minishell.h"
 
 int ms_builtin_env(t_ctx *ctx, char **argv)
 {

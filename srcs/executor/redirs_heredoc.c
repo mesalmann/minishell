@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "executor_internal.h"
 
 static bool write_hd_line(t_ctx *ctx, t_heredoc *h, char *line)
 {

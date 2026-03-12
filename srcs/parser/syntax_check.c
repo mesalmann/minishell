@@ -74,23 +74,3 @@ bool	ms_syntax_validate(t_token *tokens, t_ctx *ctx)
 	}
 	return (true);
 }
-
-int	ms_err_syntax(t_ctx *ctx, const char *msg)
-{
-	ft_putstr_fd("minishell: ", 2);
-	ft_putendl_fd(msg, 2);
-	if (ctx)
-		ctx->last_status = 2;
-	return (2);
-}
-
-int	ms_err_errno(t_ctx *ctx, const char *where)
-{
-	ft_putstr_fd("minishell: ", 2);
-	ft_putstr_fd(where, 2);
-	ft_putstr_fd(": ", 2);
-	ft_putendl_fd(strerror(errno), 2);
-	if (ctx)
-		ctx->last_status = 1;
-	return (1);
-}

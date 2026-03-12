@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <string.h>
 
 /* ── node allocation ─────────────────────────────────────────────────────── */
 
@@ -121,4 +120,27 @@ bool ms_env_unset(t_ctx *ctx, const char *key)
 		node = node->next;
 	}
 	return (true);
+}
+
+/* ── ms_env_get ───────────────────────────────────────────────────────── */
+
+char	*ms_env_get(t_ctx *ctx, const char *key)
+{
+	t_envnode	*curr;
+
+	if (!ctx || !ctx->env || !key)
+		return (NULL);
+	curr = ctx->env;
+	while (curr)
+	{
+		if (ft_strncmp(curr->key, key, ft_strlen(key)) == 0
+			&& curr->key[ft_strlen(key)] == '\0')
+		{
+			if (curr->has_val)
+				return (curr->val);
+			return (NULL);
+		}
+		curr = curr->next;
+	}
+	return (NULL);
 }

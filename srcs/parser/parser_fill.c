@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "parser_internal.h"
 
 static int count_argv_words(t_token *t)
 {

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "executor_internal.h"
 
 static int open_redir_fd(t_redir *r)
 {

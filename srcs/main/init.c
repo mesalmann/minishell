@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <string.h>
 
 /*
 ** load_env - char **envp'yi parse ederek ctx->env linked list'ine yükler.
