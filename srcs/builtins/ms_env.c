@@ -183,7 +183,10 @@ int ms_builtin_env(t_ctx *ctx, char **argv)
 			curr = curr->next;
 		}
 		ms_builtin_run_argv(ctx, &argv[cmd_idx]);
-		_exit(ctx->last_status);
+		status = ctx->last_status;
+		env_free_temp(temp);
+		ms_ctx_destroy(ctx);
+		_exit(status);
 	}
 	while (waitpid(pid, &status, 0) == -1 && errno == EINTR)
 		continue ;

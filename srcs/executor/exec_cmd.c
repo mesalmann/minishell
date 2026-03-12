@@ -20,9 +20,9 @@ static void exec_builtin_simple(t_ctx *ctx, t_cmdnode *cmd)
 
     saved_in = -1;
     saved_out = -1;
-    if (!ms_apply_redirs(cmd, &saved_in, &saved_out))
+    if ((cmd->redirs || cmd->heredocs)
+        && !ms_apply_redirs(cmd, &saved_in, &saved_out))
     {
-        ms_restore_stdio(saved_in, saved_out);
         ctx->last_status = 1;
         return;
     }
