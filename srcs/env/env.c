@@ -72,6 +72,8 @@ bool ms_env_set(t_ctx *ctx, const char *key, const char *val, bool has_val)
 {
 	t_envnode *node;
 	t_envnode *prev;
+	sigset_t old;
+	sigset_t new;
 
 	node = ctx->env;
 	prev = NULL;
@@ -85,11 +87,16 @@ bool ms_env_set(t_ctx *ctx, const char *key, const char *val, bool has_val)
 	node = node_new(key, val, has_val);
 	if (!node)
 		return (false);
+	sigemptyset(&new);
+	sigaddset(&new, SIGINT);
+	sigaddset(&new, SIGTERM);
+	sigprocmask(SIG_BLOCK, &new, &old);
 	if (prev)
 		prev->next = node;
 	else
 		ctx->env = node;
 	ctx->env_dirty = true;
+	sigprocmask(SIG_SETMASK, &old, NULL);
 	return (true);
 }
 
@@ -99,6 +106,8 @@ bool ms_env_unset(t_ctx *ctx, const char *key)
 {
 	t_envnode *node;
 	t_envnode *prev;
+	sigset_t old;
+	sigset_t new;
 
 	node = ctx->env;
 	prev = NULL;
@@ -106,10 +115,15 @@ bool ms_env_unset(t_ctx *ctx, const char *key)
 	{
 		if (strcmp(node->key, key) == 0)
 		{
+			sigemptyset(&new);
+			sigaddset(&new, SIGINT);
+			sigaddset(&new, SIGTERM);
+			sigprocmask(SIG_BLOCK, &new, &old);
 			if (prev)
 				prev->next = node->next;
 			else
 				ctx->env = node->next;
+			sigprocmask(SIG_SETMASK, &old, NULL);
 			free(node->key);
 			free(node->val);
 			free(node);

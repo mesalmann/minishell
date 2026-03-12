@@ -14,7 +14,7 @@
 
 static int export_invalid_id(const char *arg)
 {
-	ft_putstr_fd("minishell: export: `", STDERR_FILENO);
+	ft_putstr_fd("minishell: export: '", STDERR_FILENO);
 	ft_putstr_fd(arg, STDERR_FILENO);
 	ft_putendl_fd("': not a valid identifier", STDERR_FILENO);
 	return (1);
