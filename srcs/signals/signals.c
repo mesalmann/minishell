@@ -24,15 +24,15 @@ static void	handle_sigint_interactive(int sig)
 }
 
 /*
-** Heredoc handler: readline fonksiyonu cagirmaz, sadece flag set eder.
-** close(STDIN) ile readline'i NULL dondurmeye zorlar.
+** Heredoc handler: Sinyal flag'i set eder.
+** POSIX-safe: close(STDIN) yerine flag kullanilir.
+** ms_run_heredocs'te check yapilir ve readline loop iptal edilir.
 */
 static void	handle_sigint_heredoc(int sig)
 {
 	(void)sig;
 	g_sig = SIGINT;
 	write(1, "\n", 1);
-	close(STDIN_FILENO);
 }
 
 /*

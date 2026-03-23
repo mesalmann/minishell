@@ -70,9 +70,28 @@ bool ms_apply_redirs(t_cmdnode *cmd, int *sin, int *sout)
 	t_redir *r;
 
 	if (sin)
+	{
 		*sin = dup(STDIN_FILENO);
+		if (*sin == -1)
+		{
+			perror("minishell: dup(stdin)");
+			return (false);
+		}
+	}
 	if (sout)
+	{
 		*sout = dup(STDOUT_FILENO);
+		if (*sout == -1)
+		{
+			if (sin && *sin >= 0)
+			{
+				close(*sin);
+				*sin = -1;
+			}
+			perror("minishell: dup(stdout)");
+			return (false);
+		}
+	}
 	r = cmd->redirs;
 	while (r)
 	{

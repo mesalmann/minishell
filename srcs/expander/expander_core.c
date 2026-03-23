@@ -32,11 +32,27 @@ static bool expand_var_name(t_ctx *ctx, t_expbuf *eb, const char *in)
 static bool expand_dollar(t_ctx *ctx, t_expbuf *eb, const char *in)
 {
     char *val;
+    pid_t pid;
 
     eb->i++;
     if (in[eb->i] == '?')
     {
         val = ft_itoa(ctx->last_status);
+        if (!val)
+            return (false);
+        if (!ms_sb_pushs(&eb->out, &eb->len, &eb->cap, val))
+        {
+            free(val);
+            return (false);
+        }
+        free(val);
+        eb->i++;
+        return (true);
+    }
+    if (in[eb->i] == '$')
+    {
+        pid = getpid();
+        val = ft_itoa(pid);
         if (!val)
             return (false);
         if (!ms_sb_pushs(&eb->out, &eb->len, &eb->cap, val))

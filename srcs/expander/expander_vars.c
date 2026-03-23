@@ -134,7 +134,9 @@ static void	apply_word_split(t_token **tokens, t_token **p_prev,
 {
 	t_token	*head;
 	t_token	*tail;
+	t_token	*next_saved;
 
+	next_saved = curr->next;
 	head = split_expanded(expanded);
 	free(expanded);
 	if (head)
@@ -142,7 +144,7 @@ static void	apply_word_split(t_token **tokens, t_token **p_prev,
 		tail = head;
 		while (tail->next)
 			tail = tail->next;
-		tail->next = curr->next;
+		tail->next = next_saved;
 		if (*p_prev)
 			(*p_prev)->next = head;
 		else
@@ -152,14 +154,9 @@ static void	apply_word_split(t_token **tokens, t_token **p_prev,
 	else
 	{
 		if (*p_prev)
-			(*p_prev)->next = curr->next;
+			(*p_prev)->next = next_saved;
 		else
-			*tokens = curr->next;
-	}
-	free(curr->lex);
-	free(curr);
-}
-
+			*tokens = next_saved;
 bool	ms_expand_tokens(t_token **tokens, t_ctx *ctx)
 {
 	t_token	*prev;

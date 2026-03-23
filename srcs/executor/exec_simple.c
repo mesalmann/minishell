@@ -50,6 +50,11 @@ static char *search_in_paths(char **paths, char *cmd, int *perm)
 	while (paths[i])
 	{
 		full = join_path(paths[i], cmd);
+		if (!full)
+		{
+			i++;
+			continue ;
+		}
 		if (access(full, F_OK) == 0)
 		{
 			if (access(full, X_OK) == 0)

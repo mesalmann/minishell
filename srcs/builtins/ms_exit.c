@@ -66,7 +66,6 @@ int	ms_builtin_exit(t_ctx *ctx, char **argv)
 {
 	long long	status;
 
-
 	if (!argv || !argv[0])
 		return (0);
 	if (!argv[1])
@@ -78,8 +77,9 @@ int	ms_builtin_exit(t_ctx *ctx, char **argv)
 	}
 	if (argv[2])
 	{
+		exit_error(NULL, "too many arguments", 1);
 		ctx->last_status = 1;
-		return (exit_error(NULL, "too many arguments", 1));
+		return (1);
 	}
 	ctx->last_status = (int)(status & 0xFF);
 	return (-1);

@@ -41,6 +41,11 @@ static int hd_process_input(t_ctx *ctx, t_heredoc *h)
     char *line;
     int ret;
 
+    if (g_sig == SIGINT)
+    {
+        g_sig = 0;
+        return (-1);
+    }
     line = readline("> ");
     if (g_sig == SIGINT)
     {
