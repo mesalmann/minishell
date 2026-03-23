@@ -143,14 +143,19 @@ static void	hd_close_open_pipes(t_cmdnode *pipeline)
     }
 }
 
-bool ms_run_heredocs(t_ctx *ctx, t_cmdnode *pipeline)
+bool	ms_run_heredocs(t_ctx *ctx, t_cmdnode *pipeline)
 {
-    t_cmdnode *cmd;
-    t_heredoc *h;
-    int        saved_stdin;
+	t_cmdnode	*cmd;
+	t_heredoc	*h;
+	int			saved_stdin;
 
-    saved_stdin = dup(STDIN_FILENO);
-    ms_sig_install_heredoc();
+	saved_stdin = dup(STDIN_FILENO);
+	if (saved_stdin < 0)
+	{
+		ft_putstr_fd("minishell: cannot save stdin\n", 2);
+		return (false);
+	}
+	ms_sig_install_heredoc();
     cmd = pipeline;
     while (cmd)
     {

@@ -32,8 +32,10 @@ void	ms_close_all_pipes(int *pipes, int count)
 	i = 0;
 	while (i < count)
 	{
-		close(pipes[i * 2]);
-		close(pipes[i * 2 + 1]);
+		if (pipes[i * 2] >= 0)
+			close(pipes[i * 2]);
+		if (pipes[i * 2 + 1] >= 0)
+			close(pipes[i * 2 + 1]);
 		i++;
 	}
 }
@@ -78,6 +80,7 @@ static void ms_exec_pipeline_multi(t_ctx *ctx, t_cmdnode *pipeline)
 		ctx->last_status = 1;
 		return;
 	}
+	memset(pipes, -1, sizeof(int) * 2 * (n - 1));
 	ms_sig_install_exec();
 	if (!ms_create_pipeline(ctx, pipeline, pipes, pids))
 	{

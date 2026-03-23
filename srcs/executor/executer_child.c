@@ -62,7 +62,8 @@ void	exec_sh_fallback(char **argv, char **envp)
 		i++;
 	}
 	execve("/bin/sh", nargv, envp);
-	free(nargv);
+	if (errno != 0)
+		free(nargv);
 }
 
 static void	close_other_heredoc_fds(t_ctx *ctx, t_cmdnode *my_cmd)
@@ -181,9 +182,15 @@ static int fork_handle_error(pid_t *pids, int done, int *pipes, int n)
 static void	parent_close_used_ends(int *pipes, int n, int i)
 {
 	if (i < n - 1)
+	{
 		close(pipes[i * 2 + 1]);
+		pipes[i * 2 + 1] = -1;
+	}
 	if (i > 0)
+	{
 		close(pipes[(i - 1) * 2]);
+		pipes[(i - 1) * 2] = -1;
+	}
 }
 
 int ms_create_pipeline(t_ctx *ctx, t_cmdnode *pl, int *pipes, pid_t *pids)

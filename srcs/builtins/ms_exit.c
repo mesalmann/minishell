@@ -73,7 +73,7 @@ int	ms_builtin_exit(t_ctx *ctx, char **argv)
 		return (-1);
 	if (parse_exit_code(argv[1], &status))
 	{
-		ctx->last_status = exit_error(argv[1], "numeric argument required", 2);
+		ctx->last_status = exit_error(argv[1], "numeric argument required", 255);
 		return (-1);
 	}
 	if (argv[2])

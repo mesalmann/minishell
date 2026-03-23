@@ -70,6 +70,10 @@ static void	ms_process_line(t_ctx *ctx, char *line)
 
 static int	ms_event_hook(void)
 {
+	if (g_sig == SIGINT)
+	{
+		rl_done = 1;
+	}
 	return (0);
 }
 

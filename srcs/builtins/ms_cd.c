@@ -91,11 +91,6 @@ int	ms_builtin_cd(t_ctx *ctx, char **argv)
 	char	oldpwd[4096];
 	int		print_path;
 
-	if (argv[1] && argv[2])
-	{
-		ft_putendl_fd("minishell: cd: too many arguments", STDERR_FILENO);
-		return (1);
-	}
 	if (!getcwd(oldpwd, sizeof(oldpwd)))
 		oldpwd[0] = '\0';
 	path = resolve_cd_path(ctx, argv, &print_path);
