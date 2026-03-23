@@ -11,8 +11,20 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include <stdlib.h>
 
 volatile sig_atomic_t g_sig = 0;
+static t_ctx *g_ctx_atexit = NULL;
+
+static void cleanup_atexit(void)
+{
+	if (g_ctx_atexit)
+	{
+		ms_ctx_destroy(g_ctx_atexit);
+		rl_clear_history();
+		g_ctx_atexit = NULL;
+	}
+}
 
 static void	ms_process_line(t_ctx *ctx, char *line)
 {
@@ -58,8 +70,6 @@ static void	ms_process_line(t_ctx *ctx, char *line)
 
 static int	ms_event_hook(void)
 {
-	if (g_sig == SIGINT)
-		rl_done = 1;
 	return (0);
 }
 
@@ -71,15 +81,13 @@ void ms_loop(t_ctx *ctx, char **envp)
 	rl_event_hook = ms_event_hook;
 	while (1)
 	{
+		line = readline("minishell$ ");
 		if (g_sig == SIGINT)
 		{
 			ctx->last_status = 130;
 			g_sig = 0;
-		}
-		line = readline("minishell$ ");
-		if (g_sig == SIGINT)
-		{
-			free(line);
+			if (line)
+				free(line);
 			continue ;
 		}
 		if (line == NULL)
@@ -106,10 +114,13 @@ int main(int ac, char **av, char **envp)
 
 	(void)ac;
 	(void)av;
+	g_ctx_atexit = &ctx;
+	atexit(cleanup_atexit);
 	ms_sig_install_interactive();
 	if (ms_ctx_init(&ctx, envp) == false)
 		return (1);
 	ms_loop(&ctx, envp);
+	g_ctx_atexit = NULL;
 	ms_ctx_destroy(&ctx);
 	rl_clear_history();
 	return (ctx.last_status);
