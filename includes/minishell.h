@@ -134,7 +134,7 @@ char *ft_substr(char const *s, unsigned int start, size_t len);
 void ft_putstr_fd(const char *s, int fd);
 void ft_putendl_fd(const char *s, int fd);
 char *ft_itoa(int n);
-void ms_loop(t_ctx *ctx, char **envp);
+void ms_loop(t_ctx *ctx);
 void free_tab(char **tab);
 bool ms_ctx_init(t_ctx *ctx, char **envp);
 void ms_ctx_destroy(t_ctx *ctx);

@@ -157,6 +157,11 @@ static void	apply_word_split(t_token **tokens, t_token **p_prev,
 			(*p_prev)->next = next_saved;
 		else
 			*tokens = next_saved;
+	}
+	free(curr->lex);
+	free(curr);
+}
+
 bool	ms_expand_tokens(t_token **tokens, t_ctx *ctx)
 {
 	t_token	*prev;

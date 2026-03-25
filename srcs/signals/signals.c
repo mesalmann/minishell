@@ -35,10 +35,6 @@ static void	handle_sigint_heredoc(int sig)
 	write(1, "\n", 1);
 }
 
-/*
-** Interactive mod: prompt beklerken kullanilir.
-** SIGINT -> handler_interactive, SIGQUIT -> SIG_IGN
-*/
 void	ms_sig_install_interactive(void)
 {
 	struct sigaction	sa;
@@ -49,6 +45,7 @@ void	ms_sig_install_interactive(void)
 	sigaction(SIGINT, &sa, NULL);
 	sa.sa_handler = SIG_IGN;
 	sigaction(SIGQUIT, &sa, NULL);
+
 }
 
 /*

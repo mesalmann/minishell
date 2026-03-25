@@ -12,11 +12,6 @@
 
 #include "minishell.h"
 
-/*
-** load_env - char **envp'yi parse ederek ctx->env linked list'ine yükler.
-** Her giriş "KEY=VALUE" formatındadır (standart envp garantisi).
-** '=' yoksa: anahtar olarak ekler, has_val=false (güvenli fallback).
-*/
 static bool load_env_entry(t_ctx *ctx, char *entry)
 {
 	char *eq;
@@ -97,10 +92,6 @@ bool ms_ctx_init(t_ctx *ctx, char **envp)
 	return (true);
 }
 
-/*
-** ms_ctx_destroy - ctx'nin tüm dinamik kaynaklarını serbest bırakır.
-** main() çıkışında çağrılmalıdır.
-*/
 void ms_ctx_destroy(t_ctx *ctx)
 {
 	t_envnode *node;
