@@ -45,23 +45,6 @@ void	ms_sig_install_interactive(void)
 	sigaction(SIGINT, &sa, NULL);
 	sa.sa_handler = SIG_IGN;
 	sigaction(SIGQUIT, &sa, NULL);
-
-}
-
-/*
-** Exec mod: fork sonrasi parent beklerken kullanilir.
-** SIGINT -> SIG_IGN (parent sessiz kalir, child olur)
-** SIGQUIT -> SIG_IGN (parent sessiz kalir)
-*/
-void	ms_sig_install_exec(void)
-{
-	struct sigaction	sa;
-
-	sa.sa_flags = 0;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_handler = SIG_IGN;
-	sigaction(SIGINT, &sa, NULL);
-	sigaction(SIGQUIT, &sa, NULL);
 }
 
 /*
@@ -79,15 +62,6 @@ void	ms_sig_install_heredoc(void)
 	sigaction(SIGINT, &sa, NULL);
 	sa.sa_handler = SIG_IGN;
 	sigaction(SIGQUIT, &sa, NULL);
-}
-
-/*
-** Child process reset: execve oncesi tum signallari default'a dondurur.
-*/
-void	ms_sig_child_reset(void)
-{
-	signal(SIGINT, SIG_DFL);
-	signal(SIGQUIT, SIG_DFL);
 }
 
 /*

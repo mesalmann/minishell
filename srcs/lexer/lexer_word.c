@@ -12,12 +12,6 @@
 
 #include "lexer_internal.h"
 
-void	ms_lex_skip_spaces(const char *line, int *idx)
-{
-	while (line && line[*idx] && isspace((unsigned char)line[*idx]))
-		(*idx)++;
-}
-
 static void	update_qstate(t_qstate *state, char c)
 {
 	if (*state == Q_NONE && c == '\'')
@@ -35,20 +29,17 @@ static int	word_process(const char *s, int start, char *out)
 	t_qstate	state;
 	int			len;
 	int			i;
-	int			k;
 
 	state = Q_NONE;
 	len = 0;
 	i = start;
-	k = 0;
 	while (s[i])
 	{
-		if (state == Q_NONE
-			&& (isspace((unsigned char)s[i])
+		if (state == Q_NONE && (isspace((unsigned char)s[i])
 				|| ms_is_operator_char(s[i])))
 			break ;
 		if (out)
-			out[k++] = s[i];
+			out[len] = s[i];
 		update_qstate(&state, s[i]);
 		len++;
 		i++;
@@ -56,7 +47,7 @@ static int	word_process(const char *s, int start, char *out)
 	if (state != Q_NONE)
 		return (-1);
 	if (out)
-		out[k] = '\0';
+		out[len] = '\0';
 	return (len);
 }
 
@@ -98,32 +89,4 @@ t_token	*ms_handle_word(const char *line, int *idx)
 	}
 	*idx += len;
 	return (new);
-}
-
-int	ms_has_unmatched_quote(const char *s, int idx)
-{
-	t_qstate	state;
-
-	state = Q_NONE;
-	while (s[idx])
-	{
-		if (state == Q_NONE
-			&& (isspace((unsigned char)s[idx])
-				|| ms_is_operator_char(s[idx])))
-			break ;
-		if (state == Q_NONE && s[idx] == '\'')
-			state = Q_SINGLE;
-		else if (state == Q_NONE && s[idx] == '"')
-			state = Q_DOUBLE;
-		else if (state == Q_SINGLE && s[idx] == '\'')
-			state = Q_NONE;
-		else if (state == Q_DOUBLE && s[idx] == '"')
-			state = Q_NONE;
-		idx++;
-	}
-	if (state == Q_SINGLE)
-		return ('\'');
-	if (state == Q_DOUBLE)
-		return ('"');
-	return (0);
 }

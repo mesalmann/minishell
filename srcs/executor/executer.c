@@ -12,82 +12,39 @@
 
 #include "executor_internal.h"
 
-int	ms_count_cmds(t_cmdnode *cmd)
+static bool	init_pipes_pids(int n, int **pipes, pid_t **pids)
 {
-	int	n;
-
-	n = 0;
-	while (cmd)
+	*pipes = malloc(sizeof(int) * 2 * (n - 1));
+	*pids = malloc(sizeof(pid_t) * n);
+	if (!*pipes || !*pids)
 	{
-		n++;
-		cmd = cmd->next;
+		free(*pipes);
+		free(*pids);
+		return (false);
 	}
-	return (n);
+	memset(*pipes, -1, sizeof(int) * 2 * (n - 1));
+	return (true);
 }
 
-void	ms_close_all_pipes(int *pipes, int count)
+static void	ms_exec_pipeline_multi(t_ctx *ctx, t_cmdnode *pipeline)
 {
-	int	i;
-
-	i = 0;
-	while (i < count)
-	{
-		if (pipes[i * 2] >= 0)
-			close(pipes[i * 2]);
-		if (pipes[i * 2 + 1] >= 0)
-			close(pipes[i * 2 + 1]);
-		i++;
-	}
-}
-
-static void	wait_children(t_ctx *ctx, pid_t *pids, int n)
-{
-	int	i;
-	int	status;
-
-	i = 0;
-	while (i < n)
-	{
-		while (waitpid(pids[i], &status, 0) == -1 && errno == EINTR)
-			continue ;
-		if (i == n - 1)
-		{
-			if (WIFEXITED(status))
-				ctx->last_status = WEXITSTATUS(status);
-			else if (WIFSIGNALED(status))
-			{
-				ctx->last_status = 128 + WTERMSIG(status);
-				ms_print_signal_msg(status);
-			}
-		}
-		i++;
-	}
-}
-
-static void ms_exec_pipeline_multi(t_ctx *ctx, t_cmdnode *pipeline)
-{
-	int n;
-	int *pipes;
-	pid_t *pids;
+	int		n;
+	int		*pipes;
+	pid_t	*pids;
 
 	n = ms_count_cmds(pipeline);
-	pipes = malloc(sizeof(int) * 2 * (n - 1));
-	pids = malloc(sizeof(pid_t) * n);
-	if (!pipes || !pids)
+	if (!init_pipes_pids(n, &pipes, &pids))
 	{
-		free(pipes);
-		free(pids);
 		ctx->last_status = 1;
-		return;
+		return ;
 	}
-	memset(pipes, -1, sizeof(int) * 2 * (n - 1));
 	ms_sig_install_exec();
 	if (!ms_create_pipeline(ctx, pipeline, pipes, pids))
 	{
 		ms_sig_install_interactive();
 		free(pipes);
 		free(pids);
-		return;
+		return ;
 	}
 	wait_children(ctx, pids, n);
 	ms_sig_install_interactive();
@@ -111,20 +68,20 @@ static void	ms_update_underscore(t_ctx *ctx, t_cmdnode *pipeline)
 	ms_env_set(ctx, "_", last->argv[i], true);
 }
 
-void ms_execute_pipeline(t_ctx *ctx, t_cmdnode *pipeline)
+void	ms_execute_pipeline(t_ctx *ctx, t_cmdnode *pipeline)
 {
 	if (!pipeline)
-		return;
+		return ;
 	if (!ms_run_heredocs(ctx, pipeline))
 	{
 		ctx->last_status = 130;
-		return;
+		return ;
 	}
 	if (!pipeline->next)
 	{
 		ms_exec_simple(ctx, pipeline);
 		ms_update_underscore(ctx, pipeline);
-		return;
+		return ;
 	}
 	ms_exec_pipeline_multi(ctx, pipeline);
 	ms_update_underscore(ctx, pipeline);

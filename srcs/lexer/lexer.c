@@ -12,76 +12,62 @@
 
 #include "lexer_internal.h"
 
-static void	append_token(t_token **head, t_token **tail, t_token *new)
+static void	mark_heredoc_if_needed(t_token *prev, t_token *new)
 {
-	if (!*head)
-		*head = new;
-	else
-		(*tail)->next = new;
-	*tail = new;
+	if (!prev || prev->kind != TK_OP || prev->op != OP_HEREDOC)
+		return ;
+	if (!new || new->kind != TK_WORD)
+		return ;
+	ms_mark_heredoc_delim(prev, new);
 }
 
-static bool	report_unmatched_quote(t_ctx *ctx, t_token **head, int quote)
+static bool	append_token(t_token **head, t_token **tail, t_token *new)
 {
-	char	c;
-
-	c = (char)quote;
-	ms_token_free(*head);
-	ft_putstr_fd("minishell: unexpected EOF while looking", 2);
-	ft_putstr_fd(" for matching `", 2);
-	write(2, &c, 1);
-	ft_putendl_fd("'", 2);
-	if (ctx)
-		ctx->last_status = 2;
-	return (false);
-}
-
-static bool	report_syntax_error(t_ctx *ctx, t_token **head)
-{
-	ms_token_free(*head);
-	ft_putendl_fd("minishell: syntax error near unexpected token", 2);
-	if (ctx)
-		ctx->last_status = 2;
-	return (false);
-}
-
-static bool	build_token(t_ctx *ctx, const char *line, t_token **lst, int *idx)
-{
-	t_token	*new;
-	int		uq;
-
-	if (ms_is_operator_char(line[*idx]))
-		new = ms_handle_operator(line, idx);
-	else
-	{
-		uq = ms_has_unmatched_quote(line, *idx);
-		new = ms_handle_word(line, idx);
-		if (!new && uq)
-			return (report_unmatched_quote(ctx, &lst[0], uq));
-	}
 	if (!new)
-		return (report_syntax_error(ctx, &lst[0]));
-	if (new->kind == TK_WORD && lst[1] && lst[1]->op == OP_HEREDOC)
-		ms_mark_heredoc_delim(lst[1], new);
-	append_token(&lst[0], &lst[1], new);
+		return (false);
+	if (!*head)
+	{
+		*head = new;
+		*tail = new;
+		return (true);
+	}
+	mark_heredoc_if_needed(*tail, new);
+	(*tail)->next = new;
+	*tail = new;
 	return (true);
+}
+
+static t_token	*lex_one_token(const char *line, int *idx)
+{
+	if (ms_is_operator_char(line[*idx]))
+		return (ms_handle_operator(line, idx));
+	return (ms_handle_word(line, idx));
 }
 
 t_token	*ms_tokenize(const char *line, t_ctx *ctx)
 {
-	t_token	*lst[2];
+	t_token	*head;
+	t_token	*tail;
+	t_token	*new;
 	int		idx;
 
-	lst[0] = NULL;
-	lst[1] = NULL;
+	(void)ctx;
+	if (!line)
+		return (NULL);
+	head = NULL;
+	tail = NULL;
 	idx = 0;
-	while (line && line[idx])
+	while (line[idx])
 	{
 		ms_lex_skip_spaces(line, &idx);
 		if (!line[idx])
 			break ;
-		if (!build_token(ctx, line, lst, &idx))
+		new = lex_one_token(line, &idx);
+		if (!append_token(&head, &tail, new))
+		{
+			ms_token_free(head);
 			return (NULL);
+		}
 	}
-	return (lst[0]);
+	return (head);
 }

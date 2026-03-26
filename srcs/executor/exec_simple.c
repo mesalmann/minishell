@@ -12,10 +12,10 @@
 
 #include "executor_internal.h"
 
-static char *join_path(char *dir, char *cmd)
+static char	*join_path(char *dir, char *cmd)
 {
-	char *temp;
-	char *full_path;
+	char	*temp;
+	char	*full_path;
 
 	temp = ft_strjoin(dir, "/");
 	if (!temp)
@@ -25,7 +25,7 @@ static char *join_path(char *dir, char *cmd)
 	return (full_path);
 }
 
-static char *find_direct_path(char *cmd)
+static char	*find_direct_path(char *cmd)
 {
 	struct stat	st;
 
@@ -41,21 +41,16 @@ static char *find_direct_path(char *cmd)
 	return (ft_strdup(cmd));
 }
 
-static char *search_in_paths(char **paths, char *cmd, int *perm)
+static char	*search_in_paths(char **paths, char *cmd, int *perm)
 {
-	char *full;
-	int i;
+	char	*full;
+	int		i;
 
 	i = 0;
 	while (paths[i])
 	{
 		full = join_path(paths[i], cmd);
-		if (!full)
-		{
-			i++;
-			continue ;
-		}
-		if (access(full, F_OK) == 0)
+		if (full && access(full, F_OK) == 0)
 		{
 			if (access(full, X_OK) == 0)
 				return (full);
@@ -67,16 +62,14 @@ static char *search_in_paths(char **paths, char *cmd, int *perm)
 	return (NULL);
 }
 
-static char *ms_find_path(char *cmd, char **envp)
+static char	*ms_find_path(char *cmd, char **envp)
 {
-	int i;
-	char **paths;
-	char *result;
-	int perm;
+	int		i;
+	char	**paths;
+	char	*result;
+	int		perm;
 
 	perm = 0;
-	if (ft_strchr(cmd, '/'))
-		return (find_direct_path(cmd));
 	i = 0;
 	while (envp[i] && ft_strncmp(envp[i], "PATH=", 5) != 0)
 		i++;
@@ -97,9 +90,11 @@ static char *ms_find_path(char *cmd, char **envp)
 	return (result);
 }
 
-char *ms_resolve_path(t_ctx *ctx, const char *file)
+char	*ms_resolve_path(t_ctx *ctx, const char *file)
 {
 	if (ctx->env_dirty && !ms_env_build_envp(ctx))
 		return (NULL);
+	if (ft_strchr(file, '/'))
+		return (find_direct_path((char *)file));
 	return (ms_find_path((char *)file, ctx->envp_cache));
 }

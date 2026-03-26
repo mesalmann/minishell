@@ -12,35 +12,6 @@
 
 #include "lexer_internal.h"
 
-t_token	*token_new(t_tokkind kind, t_opkind op, char *lex)
-{
-	t_token	*tok;
-
-	tok = malloc(sizeof(t_token));
-	if (!tok)
-		return (NULL);
-	tok->kind = kind;
-	tok->op = op;
-	tok->lex = lex;
-	tok->no_expand = false;
-	tok->next = NULL;
-	return (tok);
-}
-
-void	ms_token_free(t_token *toks)
-{
-	t_token	*tmp;
-
-	while (toks)
-	{
-		tmp = toks->next;
-		if (toks->lex)
-			free(toks->lex);
-		free(toks);
-		toks = tmp;
-	}
-}
-
 static bool	is_quoted_word(const char *s)
 {
 	int	i;
