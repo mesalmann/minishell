@@ -12,16 +12,11 @@
 
 #include "minishell.h"
 
-/*
-** load_env - char **envp'yi parse ederek ctx->env linked list'ine yükler.
-** Her giriş "KEY=VALUE" formatındadır (standart envp garantisi).
-** '=' yoksa: anahtar olarak ekler, has_val=false (güvenli fallback).
-*/
-static bool load_env_entry(t_ctx *ctx, char *entry)
+static bool	load_env_entry(t_ctx *ctx, char *entry)
 {
-	char *eq;
-	char *key;
-	char *val;
+	char	*eq;
+	char	*key;
+	char	*val;
 
 	eq = strchr(entry, '=');
 	if (!eq)
@@ -45,9 +40,9 @@ static bool load_env_entry(t_ctx *ctx, char *entry)
 	return (true);
 }
 
-static bool load_env(t_ctx *ctx, char **envp)
+static bool	load_env(t_ctx *ctx, char **envp)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (envp[i])
@@ -59,11 +54,11 @@ static bool load_env(t_ctx *ctx, char **envp)
 	return (true);
 }
 
-static void increment_shlvl(t_ctx *ctx)
+static void	increment_shlvl(t_ctx *ctx)
 {
-	char *val;
-	int level;
-	char *new_val;
+	char	*val;
+	int		level;
+	char	*new_val;
 
 	val = ms_env_get(ctx, "SHLVL");
 	if (val)
@@ -80,7 +75,7 @@ static void increment_shlvl(t_ctx *ctx)
 	}
 }
 
-bool ms_ctx_init(t_ctx *ctx, char **envp)
+bool	ms_ctx_init(t_ctx *ctx, char **envp)
 {
 	ft_memset(ctx, 0, sizeof(t_ctx));
 	ctx->interactive = isatty(STDIN_FILENO);
@@ -95,39 +90,4 @@ bool ms_ctx_init(t_ctx *ctx, char **envp)
 	}
 	increment_shlvl(ctx);
 	return (true);
-}
-
-/*
-** ms_ctx_destroy - ctx'nin tüm dinamik kaynaklarını serbest bırakır.
-** main() çıkışında çağrılmalıdır.
-*/
-void ms_ctx_destroy(t_ctx *ctx)
-{
-	t_envnode *node;
-	t_envnode *tmp;
-
-	if (!ctx)
-		return;
-	node = ctx->env;
-	while (node)
-	{
-		tmp = node->next;
-		free(node->key);
-		free(node->val);
-		free(node);
-		node = tmp;
-	}
-	ctx->env = NULL;
-	free_tab(ctx->envp_cache);
-	ctx->envp_cache = NULL;
-	if (ctx->cur_ast)
-	{
-		ms_cmd_free_list(ctx->cur_ast);
-		ctx->cur_ast = NULL;
-	}
-	if (ctx->cur_tokens)
-	{
-		ms_token_free(ctx->cur_tokens);
-		ctx->cur_tokens = NULL;
-	}
 }

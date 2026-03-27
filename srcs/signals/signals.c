@@ -23,8 +23,9 @@ static void	handle_sigint_interactive(int sig)
 }
 
 /*
-** Heredoc handler: readline fonksiyonu cagirmaz, sadece flag set eder.
-** close(STDIN) ile readline'i NULL dondurmeye zorlar.
+** Heredoc handler: Sinyal flag'i set eder.
+** POSIX-safe: close(STDIN) yerine flag kullanilir.
+** ms_run_heredocs'te check yapilir ve readline loop iptal edilir.
 */
 static void	handle_sigint_heredoc(int sig)
 {
@@ -32,10 +33,6 @@ static void	handle_sigint_heredoc(int sig)
 	g_sig = SIGINT;
 }
 
-/*
-** Interactive mod: prompt beklerken kullanilir.
-** SIGINT -> handler_interactive, SIGQUIT -> SIG_IGN
-*/
 void	ms_sig_install_interactive(void)
 {
 	struct sigaction	sa;
@@ -45,22 +42,6 @@ void	ms_sig_install_interactive(void)
 	sa.sa_handler = handle_sigint_interactive;
 	sigaction(SIGINT, &sa, NULL);
 	sa.sa_handler = SIG_IGN;
-	sigaction(SIGQUIT, &sa, NULL);
-}
-
-/*
-** Exec mod: fork sonrasi parent beklerken kullanilir.
-** SIGINT -> SIG_IGN (parent sessiz kalir, child olur)
-** SIGQUIT -> SIG_IGN (parent sessiz kalir)
-*/
-void	ms_sig_install_exec(void)
-{
-	struct sigaction	sa;
-
-	sa.sa_flags = 0;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_handler = SIG_IGN;
-	sigaction(SIGINT, &sa, NULL);
 	sigaction(SIGQUIT, &sa, NULL);
 }
 
@@ -79,15 +60,6 @@ void	ms_sig_install_heredoc(void)
 	sigaction(SIGINT, &sa, NULL);
 	sa.sa_handler = SIG_IGN;
 	sigaction(SIGQUIT, &sa, NULL);
-}
-
-/*
-** Child process reset: execve oncesi tum signallari default'a dondurur.
-*/
-void	ms_sig_child_reset(void)
-{
-	signal(SIGINT, SIG_DFL);
-	signal(SIGQUIT, SIG_DFL);
 }
 
 /*

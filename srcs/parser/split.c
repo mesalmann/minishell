@@ -12,6 +12,8 @@
 
 #include "minishell.h"
 
+#include "minishell.h"
+
 static int	is_sep(char s, char c)
 {
 	if (s == c)
@@ -55,11 +57,37 @@ static char	*word_dup(const char *str, int start, int finish)
 	return (word);
 }
 
-char	**ft_split(char const *s, char c)
+static char	**fill_split(char **split, char const *s, char c)
 {
 	size_t	i;
 	size_t	j;
-	int		index;
+	int		idx;
+
+	i = -1;
+	j = 0;
+	idx = -1;
+	while (++i <= ft_strlen(s))
+	{
+		if (s[i] != c && idx < 0)
+			idx = i;
+		else if ((s[i] == c || s[i] == '\0') && idx >= 0)
+		{
+			split[j] = word_dup(s, idx, i);
+			if (!split[j])
+			{
+				free_tab(split);
+				return (NULL);
+			}
+			j++;
+			idx = -1;
+		}
+	}
+	split[j] = NULL;
+	return (split);
+}
+
+char	**ft_split(char const *s, char c)
+{
 	char	**split;
 
 	if (!s)
@@ -67,26 +95,5 @@ char	**ft_split(char const *s, char c)
 	split = malloc((count_words(s, c) + 1) * sizeof(char *));
 	if (!split)
 		return (NULL);
-	i = 0;
-	j = 0;
-	index = -1;
-	while (i <= ft_strlen(s))
-	{
-		if (s[i] != c && index < 0)
-			index = i;
-		else if ((s[i] == c || i == ft_strlen(s)) && index >= 0)
-		{
-			split[j] = word_dup(s, index, i);
-			if (!split[j])
-			{
-				free_tab(split);
-				return (NULL);
-			}
-			j++;
-			index = -1;
-		}
-		i++;
-	}
-	split[j] = 0;
-	return (split);
+	return (fill_split(split, s, c));
 }

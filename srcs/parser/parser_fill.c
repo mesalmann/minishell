@@ -12,78 +12,78 @@
 
 #include "parser_internal.h"
 
-static int count_argv_words(t_token *t)
+static int	count_argv_words(t_token *t)
 {
-    int count;
+	int	count;
 
-    count = 0;
-    while (t && !(t->kind == TK_OP && t->op == OP_PIPE))
-    {
-        if (t->kind == TK_WORD)
-        {
-            count++;
-            t = t->next;
-            continue;
-        }
-        if (t->kind == TK_OP && ms_is_redir_or_heredoc(t->op))
-        {
-            t = t->next;
-            if (t)
-                t = t->next;
-            continue;
-        }
-        t = t->next;
-    }
-    return (count);
+	count = 0;
+	while (t && !(t->kind == TK_OP && t->op == OP_PIPE))
+	{
+		if (t->kind == TK_WORD)
+		{
+			count++;
+			t = t->next;
+			continue ;
+		}
+		if (t->kind == TK_OP && ms_is_redir_or_heredoc(t->op))
+		{
+			t = t->next;
+			if (t)
+				t = t->next;
+			continue ;
+		}
+		t = t->next;
+	}
+	return (count);
 }
 
-static bool argv_fill_fail(t_cmdnode *cmd, int filled)
+static bool	argv_fill_fail(t_cmdnode *cmd, int filled)
 {
-    int i;
+	int	i;
 
-    i = 0;
-    while (i < filled)
-    {
-        free(cmd->argv[i]);
-        i++;
-    }
-    free(cmd->argv);
-    cmd->argv = NULL;
-    return (false);
+	i = 0;
+	while (i < filled)
+	{
+		free(cmd->argv[i]);
+		i++;
+	}
+	free(cmd->argv);
+	cmd->argv = NULL;
+	return (false);
 }
 
-static t_token *skip_redir_token(t_token *t)
+static t_token	*skip_redir_token(t_token *t)
 {
-    t = t->next;
-    if (t)
-        t = t->next;
-    return (t);
+	t = t->next;
+	if (t)
+		t = t->next;
+	return (t);
 }
 
-bool ms_fill_argv(t_cmdnode *cmd, t_token *t)
+bool	ms_fill_argv(t_cmdnode *cmd, t_token *t)
 {
-    int i;
-    int n;
+	int	i;
+	int	n;
 
-    n = count_argv_words(t);
-    cmd->argv = malloc(sizeof(char *) * (n + 1));
-    if (!cmd->argv)
-        return (false);
-    i = 0;
-    while (t && !(t->kind == TK_OP && t->op == OP_PIPE))
-    {
-        if (t->kind == TK_WORD)
-        {
-            cmd->argv[i] = ft_strdup(t->lex);
-            if (!cmd->argv[i])
-                return (argv_fill_fail(cmd, i));
-            i++;
-        }
-        if (t->kind == TK_OP && ms_is_redir_or_heredoc(t->op))
-            t = skip_redir_token(t);
-        else
-            t = t->next;
-    }
-    cmd->argv[i] = NULL;
-    return (true);
+	n = count_argv_words(t);
+	cmd->argv = malloc(sizeof(char *) * (n + 1));
+	if (!cmd->argv)
+		return (false);
+	i = 0;
+	while (t && !(t->kind == TK_OP && t->op == OP_PIPE))
+	{
+		if (t->kind == TK_WORD)
+		{
+			cmd->argv[i] = ft_strdup(t->lex);
+			if (!cmd->argv[i])
+				return (argv_fill_fail(cmd, i));
+			i++;
+		}
+		if (t->kind == TK_OP && ms_is_redir_or_heredoc(t->op))
+			t = skip_redir_token(t);
+		else
+			t = t->next;
+	}
+	cmd->argv[i] = NULL;
+	return (true);
 }

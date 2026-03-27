@@ -12,62 +12,62 @@
 
 #include "minishell.h"
 
-static void free_redir_list(t_redir *r)
+static void	free_redir_list(t_redir *r)
 {
-    t_redir *tmp;
+	t_redir	*tmp;
 
-    while (r)
-    {
-        tmp = r->next;
-        free(r->target);
-        free(r);
-        r = tmp;
-    }
+	while (r)
+	{
+		tmp = r->next;
+		free(r->target);
+		free(r);
+		r = tmp;
+	}
 }
 
-static void free_heredoc_list(t_heredoc *h)
+static void	free_heredoc_list(t_heredoc *h)
 {
-    t_heredoc *tmp;
+	t_heredoc	*tmp;
 
-    while (h)
-    {
-        tmp = h->next;
-        if (h->pipe_rd >= 0)
-            close(h->pipe_rd);
-        if (h->pipe_wr >= 0)
-            close(h->pipe_wr);
-        free(h->delim);
-        free(h);
-        h = tmp;
-    }
+	while (h)
+	{
+		tmp = h->next;
+		if (h->pipe_rd >= 0)
+			close(h->pipe_rd);
+		if (h->pipe_wr >= 0)
+			close(h->pipe_wr);
+		free(h->delim);
+		free(h);
+		h = tmp;
+	}
 }
 
-void ms_cmd_free(t_cmdnode *cmd)
+void	ms_cmd_free(t_cmdnode *cmd)
 {
-    int i;
+	int	i;
 
-    if (!cmd)
-        return;
-    if (cmd->argv)
-    {
-        i = 0;
-        while (cmd->argv[i])
-            free(cmd->argv[i++]);
-        free(cmd->argv);
-    }
-    free_redir_list(cmd->redirs);
-    free_heredoc_list(cmd->heredocs);
-    free(cmd);
+	if (!cmd)
+		return ;
+	if (cmd->argv)
+	{
+		i = 0;
+		while (cmd->argv[i])
+			free(cmd->argv[i++]);
+		free(cmd->argv);
+	}
+	free_redir_list(cmd->redirs);
+	free_heredoc_list(cmd->heredocs);
+	free(cmd);
 }
 
-void ms_cmd_free_list(t_cmdnode *head)
+void	ms_cmd_free_list(t_cmdnode *head)
 {
-    t_cmdnode *tmp;
+	t_cmdnode	*tmp;
 
-    while (head)
-    {
-        tmp = head->next;
-        ms_cmd_free(head);
-        head = tmp;
-    }
+	while (head)
+	{
+		tmp = head->next;
+		ms_cmd_free(head);
+		head = tmp;
+	}
 }

@@ -17,7 +17,7 @@ bool	ms_is_operator_char(char c)
 	return (c == '<' || c == '>' || c == '|');
 }
 
-static t_opkind	operator_kind(const char *line, int *idx)
+static t_opkind	check_double_op(const char *line, int *idx)
 {
 	if (line[*idx] == '<' && line[*idx + 1] == '<')
 	{
@@ -29,22 +29,26 @@ static t_opkind	operator_kind(const char *line, int *idx)
 		*idx += 2;
 		return (OP_OUT_APPEND);
 	}
-	if (line[*idx] == '<')
-	{
-		(*idx)++;
-		return (OP_IN);
-	}
-	if (line[*idx] == '>')
-	{
-		(*idx)++;
-		return (OP_OUT_TRUNC);
-	}
-	if (line[*idx] == '|')
-	{
-		(*idx)++;
-		return (OP_PIPE);
-	}
 	return (OP_NONE);
+}
+
+static t_opkind	operator_kind(const char *line, int *idx)
+{
+	t_opkind	op;
+
+	op = check_double_op(line, idx);
+	if (op != OP_NONE)
+		return (op);
+	if (line[*idx] == '<')
+		op = OP_IN;
+	else if (line[*idx] == '>')
+		op = OP_OUT_TRUNC;
+	else if (line[*idx] == '|')
+		op = OP_PIPE;
+	else
+		return (OP_NONE);
+	(*idx)++;
+	return (op);
 }
 
 t_token	*ms_handle_operator(const char *line, int *idx)

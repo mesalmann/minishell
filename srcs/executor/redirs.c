@@ -12,7 +12,7 @@
 
 #include "executor_internal.h"
 
-static int open_redir_fd(t_redir *r)
+static int	open_redir_fd(t_redir *r)
 {
 	if (r->type == RD_IN)
 		return (open(r->target, O_RDONLY));
@@ -21,26 +21,10 @@ static int open_redir_fd(t_redir *r)
 	return (open(r->target, O_WRONLY | O_CREAT | O_APPEND, 0644));
 }
 
-static void restore_and_clear(int *saved_stdin, int *saved_stdout)
+static int	apply_one_redir(t_redir *r)
 {
-	if (saved_stdin && *saved_stdin >= 0)
-	{
-		dup2(*saved_stdin, STDIN_FILENO);
-		close(*saved_stdin);
-		*saved_stdin = -1;
-	}
-	if (saved_stdout && *saved_stdout >= 0)
-	{
-		dup2(*saved_stdout, STDOUT_FILENO);
-		close(*saved_stdout);
-		*saved_stdout = -1;
-	}
-}
-
-static int apply_one_redir(t_redir *r)
-{
-	int fd;
-	int tfd;
+	int	fd;
+	int	tfd;
 
 	fd = open_redir_fd(r);
 	if (fd == -1)
@@ -65,14 +49,12 @@ static int apply_one_redir(t_redir *r)
 	return (1);
 }
 
-bool ms_apply_redirs(t_cmdnode *cmd, int *sin, int *sout)
+bool	ms_apply_redirs(t_cmdnode *cmd, int *sin, int *sout)
 {
-	t_redir *r;
+	t_redir	*r;
 
-	if (sin)
-		*sin = dup(STDIN_FILENO);
-	if (sout)
-		*sout = dup(STDOUT_FILENO);
+	if (!save_stdio(sin, sout))
+		return (false);
 	r = cmd->redirs;
 	while (r)
 	{
@@ -89,18 +71,4 @@ bool ms_apply_redirs(t_cmdnode *cmd, int *sin, int *sout)
 		return (false);
 	}
 	return (true);
-}
-
-void ms_restore_stdio(int saved_stdin, int saved_stdout)
-{
-	if (saved_stdin >= 0)
-	{
-		dup2(saved_stdin, STDIN_FILENO);
-		close(saved_stdin);
-	}
-	if (saved_stdout >= 0)
-	{
-		dup2(saved_stdout, STDOUT_FILENO);
-		close(saved_stdout);
-	}
 }
