@@ -12,21 +12,12 @@
 
 #include "minishell.h"
 
-/*
-** Interactive prompt handler: readline aktifken SIGINT gelince
-** mevcut satiri temizleyip yeni prompt basar.
-*/
 static void	handle_sigint_interactive(int sig)
 {
 	(void)sig;
 	g_sig = SIGINT;
 }
 
-/*
-** Heredoc handler: Sinyal flag'i set eder.
-** POSIX-safe: close(STDIN) yerine flag kullanilir.
-** ms_run_heredocs'te check yapilir ve readline loop iptal edilir.
-*/
 static void	handle_sigint_heredoc(int sig)
 {
 	(void)sig;
@@ -45,11 +36,6 @@ void	ms_sig_install_interactive(void)
 	sigaction(SIGQUIT, &sa, NULL);
 }
 
-/*
-** Heredoc mod: heredoc readline sirasinda kullanilir.
-** SIGINT -> handler_heredoc (flag + stdin kapat)
-** SIGQUIT -> SIG_IGN
-*/
 void	ms_sig_install_heredoc(void)
 {
 	struct sigaction	sa;
@@ -62,10 +48,6 @@ void	ms_sig_install_heredoc(void)
 	sigaction(SIGQUIT, &sa, NULL);
 }
 
-/*
-** waitpid sonrasi signal kaynakli olum mesajlarini basar.
-** Bash: SIGQUIT -> "Quit (core dumped)\n"
-*/
 void	ms_print_signal_msg(int status)
 {
 	if (WIFSIGNALED(status))
