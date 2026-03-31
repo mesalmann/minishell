@@ -13,7 +13,7 @@
 #include "minishell.h"
 #include "expander_internal.h"
 
-bool ambiguous_redir_err(t_ctx *ctx, t_token *tok, char *exp)
+bool	ambiguous_redir_err(t_ctx *ctx, t_token *tok, char *exp)
 {
 	ft_putstr_fd("minishell: ", 2);
 	ft_putstr_fd(tok->lex, 2);
@@ -23,10 +23,10 @@ bool ambiguous_redir_err(t_ctx *ctx, t_token *tok, char *exp)
 	return (false);
 }
 
-static bool handle_empty_expansion(t_token **toks, t_token **prev,
-								   t_token **curr, char *exp)
+static bool	handle_empty_expansion(t_token **toks, t_token **prev,
+	t_token **curr, char *exp)
 {
-	t_token *next;
+	t_token	*next;
 
 	next = (*curr)->next;
 	if (is_heredoc_op(*prev))
@@ -43,12 +43,12 @@ static bool handle_empty_expansion(t_token **toks, t_token **prev,
 	return (true);
 }
 
-static bool handle_word_expansion(t_token **toks, t_ctx *ctx,
-								  t_token **prev, t_token **curr)
+static bool	handle_word_expansion(t_token **toks, t_ctx *ctx,
+	t_token **prev, t_token **curr)
 {
-	char *exp;
-	bool hq;
-	t_token *next;
+	char		*exp;
+	bool		hq;
+	t_token		*next;
 
 	next = (*curr)->next;
 	hq = has_quotes((*curr)->lex);
@@ -72,10 +72,10 @@ static bool handle_word_expansion(t_token **toks, t_ctx *ctx,
 	return (true);
 }
 
-bool ms_expand_tokens(t_token **tokens, t_ctx *ctx)
+bool	ms_expand_tokens(t_token **tokens, t_ctx *ctx)
 {
-	t_token *prev;
-	t_token *curr;
+	t_token	*prev;
+	t_token	*curr;
 
 	if (!tokens || !ctx)
 		return (false);

@@ -1,15 +1,10 @@
 NAME = minishell
+
 CC = cc
+CFLAGS = -Wall -Wextra -Werror -Iincludes
+LDFLAGS = -lreadline
 
-# Normal build flags
-CFLAGS = -Wall -Wextra -Werror -g -Iincludes -I/opt/homebrew/opt/readline/include
-LDFLAGS = -L/opt/homebrew/opt/readline/lib
-LDLIBS = -lreadline -lhistory -lncurses
-
-# AddressSanitizer flags
-ASAN_FLAGS = -fsanitize=address -fno-omit-frame-pointer -g3 -O0
-
-SRCS = \
+SRC = \
 	srcs/main/main.c \
 	srcs/main/init.c \
 	srcs/main/init_utils.c \
@@ -39,6 +34,8 @@ SRCS = \
 	srcs/builtins/ms_pwd.c \
 	srcs/builtins/ms_echo.c \
 	srcs/builtins/ms_env.c \
+	srcs/builtins/ms_env_utils.c \
+	srcs/builtins/ms_env_utils2.c \
 	srcs/builtins/ms_cd.c \
 	srcs/builtins/ms_export.c \
 	srcs/builtins/ms_export_utils.c \
@@ -60,24 +57,22 @@ SRCS = \
 	srcs/env/env_build.c \
 	srcs/env/env_utils.c
 
-OBJS = $(SRCS:.c=.o)
+OBJ = $(SRC:.c=.o)
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
-	$(CC) $(OBJS) $(LDFLAGS) $(LDLIBS) -o $(NAME)
+$(NAME): $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) $(LDFLAGS) -o $(NAME)
 
-# 🔥 ASAN build
-asan: CFLAGS += $(ASAN_FLAGS)
-asan: LDFLAGS += $(ASAN_FLAGS)
-asan: fclean all
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS)
+	rm -f $(OBJ)
 
 fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
 
-.PHONY: all clean fclean re asan
+.PHONY: all clean fclean re

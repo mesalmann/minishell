@@ -13,9 +13,9 @@
 #include "minishell.h"
 #include "env_internal.h"
 
-static bool env_update_node(t_envnode *nd, const char *val, bool hv, t_ctx *c)
+static bool	env_update_node(t_envnode *nd, const char *val, bool hv, t_ctx *c)
 {
-	char *new_val;
+	char	*new_val;
 
 	if (hv)
 	{
@@ -30,12 +30,12 @@ static bool env_update_node(t_envnode *nd, const char *val, bool hv, t_ctx *c)
 	return (true);
 }
 
-bool ms_env_set(t_ctx *ctx, const char *key, const char *val, bool has_val)
+bool	ms_env_set(t_ctx *ctx, const char *key, const char *val, bool has_val)
 {
-	t_envnode *node;
-	t_envnode *prev;
-	sigset_t old;
-	sigset_t new;
+	t_envnode	*node;
+	t_envnode	*prev;
+	sigset_t	old;
+	sigset_t	new;
 
 	node = ctx->env;
 	prev = NULL;
@@ -59,10 +59,10 @@ bool ms_env_set(t_ctx *ctx, const char *key, const char *val, bool has_val)
 	return (true);
 }
 
-static void remove_env_node(t_ctx *ctx, t_envnode *node, t_envnode *prev)
+static void	remove_env_node(t_ctx *ctx, t_envnode *node, t_envnode *prev)
 {
-	sigset_t old;
-	sigset_t new;
+	sigset_t	old;
+	sigset_t	new;
 
 	_sigblock_env(&new, &old);
 	if (prev)
@@ -76,10 +76,10 @@ static void remove_env_node(t_ctx *ctx, t_envnode *node, t_envnode *prev)
 	ctx->env_dirty = true;
 }
 
-bool ms_env_unset(t_ctx *ctx, const char *key)
+bool	ms_env_unset(t_ctx *ctx, const char *key)
 {
-	t_envnode *node;
-	t_envnode *prev;
+	t_envnode	*node;
+	t_envnode	*prev;
 
 	node = ctx->env;
 	prev = NULL;
@@ -96,10 +96,10 @@ bool ms_env_unset(t_ctx *ctx, const char *key)
 	return (true);
 }
 
-char *ms_env_get(t_ctx *ctx, const char *key)
+char	*ms_env_get(t_ctx *ctx, const char *key)
 {
-	t_envnode *curr;
-	size_t len;
+	t_envnode	*curr;
+	size_t		len;
 
 	if (!ctx || !ctx->env || !key)
 		return (NULL);

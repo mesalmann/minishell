@@ -1,28 +1,37 @@
 /* ************************************************************************** */
-/* */
-/* :::      ::::::::   */
-/* ms_exit.c                                          :+:      :+:    :+:   */
-/* +:+ +:+         +:+     */
-/* By: hdere <hdere@student.42.fr>                +#+  +:+       +#+        */
-/* +#+#+#+#+#+   +#+           */
-/* Created: 2026/03/09 10:00:00 by hdere             #+#    #+#             */
-/* Updated: 2026/03/09 10:45:00 by hdere            ###   ########.fr       */
-/* */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ms_exit.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hdere <hdere@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/09 10:00:00 by hdere            #+#    #+#             */
+/*   Updated: 2026/03/09 10:45:00 by hdere            ###   ########.fr       */
+/*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <limits.h>
 
 static int	is_ws(char c)
 {
 	return (c == ' ' || (c >= 9 && c <= 13));
 }
 
+static int	check_overflow(unsigned long long *u_res, char c, int neg)
+{
+	unsigned long long	cutoff;
+
+	cutoff = (unsigned long long)LLONG_MAX + neg;
+	if (*u_res > (cutoff - (c - '0')) / 10)
+		return (1);
+	*u_res = *u_res * 10 + (c - '0');
+	return (0);
+}
+
 static int	parse_exit_code(const char *s, long long *res)
 {
 	int					i;
 	int					neg;
-	unsigned long long	cutoff;
 	unsigned long long	u_res;
 
 	i = 0;
@@ -35,18 +44,16 @@ static int	parse_exit_code(const char *s, long long *res)
 			neg = 1;
 	if (!(s[i] >= '0' && s[i] <= '9'))
 		return (1);
-	cutoff = (unsigned long long)LLONG_MAX + neg;
 	while (s[i] >= '0' && s[i] <= '9')
-	{
-		if (u_res > (cutoff - (s[i] - '0')) / 10)
+		if (check_overflow(&u_res, s[i++], neg))
 			return (1);
-		u_res = u_res * 10 + (s[i++] - '0');
-	}
 	while (is_ws(s[i]))
 		i++;
 	if (s[i] != '\0')
 		return (1);
-	*res = (neg) ? -(long long)u_res : (long long)u_res;
+	*res = (long long)u_res;
+	if (neg)
+		*res = -u_res;
 	return (0);
 }
 
@@ -72,7 +79,8 @@ int	ms_builtin_exit(t_ctx *ctx, char **argv)
 		return (-1);
 	if (parse_exit_code(argv[1], &status))
 	{
-		ctx->last_status = exit_error(argv[1], "numeric argument required", 255);
+		ctx->last_status = exit_error(argv[1],
+				"numeric argument required", 255);
 		return (-1);
 	}
 	if (argv[2])

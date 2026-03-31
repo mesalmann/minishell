@@ -20,7 +20,6 @@ static void	handle_sigint_interactive(int sig)
 {
 	(void)sig;
 	g_sig = SIGINT;
-	write(1, "\n", 1);
 }
 
 /*
@@ -32,7 +31,6 @@ static void	handle_sigint_heredoc(int sig)
 {
 	(void)sig;
 	g_sig = SIGINT;
-	write(1, "\n", 1);
 }
 
 void	ms_sig_install_interactive(void)

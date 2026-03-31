@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-static int export_invalid_id(const char *arg)
+static int	export_invalid_id(const char *arg)
 {
 	ft_putstr_fd("minishell: export: '", STDERR_FILENO);
 	ft_putstr_fd(arg, STDERR_FILENO);
@@ -84,11 +84,11 @@ static int	export_invalid_opt(const char *arg)
 	return (2);
 }
 
-int ms_builtin_export(t_ctx *ctx, char **argv)
+int	ms_builtin_export(t_ctx *ctx, char **argv)
 {
-	int i;
-	int ret;
-	int tmp;
+	int	i;
+	int	ret;
+	int	tmp;
 
 	if (!argv[1])
 	{

@@ -11,13 +11,13 @@
 /* ************************************************************************** */
 
 #ifndef ENV_INTERNAL_H
-#define ENV_INTERNAL_H
+# define ENV_INTERNAL_H
 
-#include "minishell.h"
-#include <signal.h>
+# include "minishell.h"
+# include <signal.h>
 
-t_envnode *node_new(const char *key, const char *val, bool has_val);
-void _sigblock_env(sigset_t *new_set, sigset_t *old_set);
-char *get_val_str(const char *val);
+t_envnode	*node_new(const char *key, const char *val, bool has_val);
+void		_sigblock_env(sigset_t *new_set, sigset_t *old_set);
+char		*get_val_str(const char *val);
 
 #endif
