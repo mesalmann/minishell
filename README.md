@@ -4,20 +4,48 @@
 
 ## Description
 
-Minishell is a project from the 42 curriculum that challenges you to build a simplified Unix shell from scratch in C. The goal is to re-implement core behaviors of `bash`, including command execution, piping, redirections, environment variable handling, signal management, and built-in commands. Through this project, you gain deep, hands-on knowledge of how processes, file descriptors, and inter-process communication work at the system level.
+Minishell is a project from the 42 curriculum that challenges you to build a simplified Unix shell from scratch in C.
 
-Key features implemented:
-- Interactive prompt with command history (via `readline`)
-- Command execution using absolute paths, relative paths, or `$PATH` lookup
-- Pipes (`|`) chaining multiple commands
-- Redirections: `<`, `>`, `>>`, and here-document (`<<`)
-- Environment variable expansion (`$VAR`, `$?`)
-- Single quotes (no interpretation) and double quotes (`$` expanded)
-- Signal handling: `ctrl-C`, `ctrl-D`, `ctrl-\` behaving like bash
-- Built-in commands: `echo`, `cd`, `pwd`, `export`, `unset`, `env`, `exit`
-- One global variable only (stores signal number)
+The goal is to re-implement core behaviors of `bash`, including:
+- command execution  
+- piping  
+- redirections  
+- environment variable handling  
+- signal management  
+- built-in commands  
+
+Through this project, you gain deep, hands-on knowledge of how **processes**, **file descriptors**, and **inter-process communication (IPC)** work at the system level.
 
 ---
+
+## Key Features
+
+- Interactive prompt with command history (via `readline`)
+- Command execution using absolute paths, relative paths, or `$PATH` lookup
+- Pipes (`|`) for chaining multiple commands
+- Redirections:
+  - `<` input
+  - `>` output
+  - `>>` append
+  - `<<` heredoc
+- Environment variable expansion (`$VAR`, `$?`)
+- Quote handling:
+  - `'` → no interpretation
+  - `"` → `$` expansion allowed
+- Signal handling:
+  - `ctrl-C`, `ctrl-D`, `ctrl-\` behaving like bash
+- Built-in commands:
+  - `echo`
+  - `cd`
+  - `pwd`
+  - `export`
+  - `unset`
+  - `env`
+  - `exit`
+- Only one global variable (used for signal handling)
+
+---
+
 ## Architecture Overview
 
 The project is structured into several modular components, each responsible for a specific stage of command processing:
@@ -32,10 +60,12 @@ Transforms the token stream into a structured representation (AST or pipeline), 
 Resolves environment variables (e.g., `$PATH`, `$HOME`, `$?`) and applies quoting rules according to shell behavior.
 
 ### Executor
-Handles process creation and command execution using system calls like `fork`, `execve`, `dup2`, and `pipe`.
+Handles process creation and command execution using system calls such as `fork`, `execve`, `dup2`, and `pipe`.
 
 ### Signals
 Manages signal behavior (`SIGINT`, `SIGQUIT`, etc.) to mimic bash-like interactive behavior.
+
+---
 
 ## Instructions
 
@@ -45,7 +75,8 @@ Manages signal behavior (`SIGINT`, `SIGQUIT`, etc.) to mimic bash-like interacti
 - GNU `readline` library installed
 - `make`
 
-On macOS, readline may require:
+### macOS setup (if needed)
+
 ```bash
 brew install readline
 export LDFLAGS="-L$(brew --prefix readline)/lib"
