@@ -18,6 +18,24 @@ Key features implemented:
 - One global variable only (stores signal number)
 
 ---
+## Architecture Overview
+
+The project is structured into several modular components, each responsible for a specific stage of command processing:
+
+### Lexer
+Splits the raw user input into meaningful tokens such as words, operators, and quoted strings.
+
+### Parser
+Transforms the token stream into a structured representation (AST or pipeline), defining command relationships and execution order.
+
+### Expander
+Resolves environment variables (e.g., `$PATH`, `$HOME`, `$?`) and applies quoting rules according to shell behavior.
+
+### Executor
+Handles process creation and command execution using system calls like `fork`, `execve`, `dup2`, and `pipe`.
+
+### Signals
+Manages signal behavior (`SIGINT`, `SIGQUIT`, etc.) to mimic bash-like interactive behavior.
 
 ## Instructions
 
@@ -87,6 +105,3 @@ AI tools (ChatGPT / Claude) were used during this project for the following task
 - **Conceptual explanations**: Understanding how `fork`/`execve`/`waitpid` interact, how pipe file descriptors need to be managed across child processes, and how heredoc behavior differs from standard redirections.
 - **Debugging assistance**: Identifying issues with signal handling edge cases and file descriptor leaks by describing symptoms and asking for potential causes.
 - **Code review suggestions**: Asking for feedback on specific functions (e.g., the tokenizer/lexer logic) to spot edge cases we may have missed.
-- **README drafting**: The initial structure of this README was generated with AI assistance and then reviewed, corrected, and completed by the project authors.
-
-> All AI-generated content was reviewed, understood, and validated before being included in the project. No AI-generated code was used without full comprehension and testing by the authors.
