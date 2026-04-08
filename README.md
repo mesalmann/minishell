@@ -4,18 +4,66 @@
 
 ## Description
 
-Minishell is a project from the 42 curriculum that challenges you to build a simplified Unix shell from scratch in C. The goal is to re-implement core behaviors of `bash`, including command execution, piping, redirections, environment variable handling, signal management, and built-in commands. Through this project, you gain deep, hands-on knowledge of how processes, file descriptors, and inter-process communication work at the system level.
+Minishell is a project from the 42 curriculum that challenges you to build a simplified Unix shell from scratch in C.
 
-Key features implemented:
+The goal is to re-implement core behaviors of `bash`, including:
+- command execution  
+- piping  
+- redirections  
+- environment variable handling  
+- signal management  
+- built-in commands  
+
+Through this project, you gain deep, hands-on knowledge of how **processes**, **file descriptors**, and **inter-process communication (IPC)** work at the system level.
+
+---
+
+## Key Features
+
 - Interactive prompt with command history (via `readline`)
 - Command execution using absolute paths, relative paths, or `$PATH` lookup
-- Pipes (`|`) chaining multiple commands
-- Redirections: `<`, `>`, `>>`, and here-document (`<<`)
+- Pipes (`|`) for chaining multiple commands
+- Redirections:
+  - `<` input
+  - `>` output
+  - `>>` append
+  - `<<` heredoc
 - Environment variable expansion (`$VAR`, `$?`)
-- Single quotes (no interpretation) and double quotes (`$` expanded)
-- Signal handling: `ctrl-C`, `ctrl-D`, `ctrl-\` behaving like bash
-- Built-in commands: `echo`, `cd`, `pwd`, `export`, `unset`, `env`, `exit`
-- One global variable only (stores signal number)
+- Quote handling:
+  - `'` → no interpretation
+  - `"` → `$` expansion allowed
+- Signal handling:
+  - `ctrl-C`, `ctrl-D`, `ctrl-\` behaving like bash
+- Built-in commands:
+  - `echo`
+  - `cd`
+  - `pwd`
+  - `export`
+  - `unset`
+  - `env`
+  - `exit`
+- Only one global variable (used for signal handling)
+
+---
+
+## Architecture Overview
+
+The project is structured into several modular components, each responsible for a specific stage of command processing:
+
+### Lexer
+Splits the raw user input into meaningful tokens such as words, operators, and quoted strings.
+
+### Parser
+Transforms the token stream into a structured representation (AST or pipeline), defining command relationships and execution order.
+
+### Expander
+Resolves environment variables (e.g., `$PATH`, `$HOME`, `$?`) and applies quoting rules according to shell behavior.
+
+### Executor
+Handles process creation and command execution using system calls such as `fork`, `execve`, `dup2`, and `pipe`.
+
+### Signals
+Manages signal behavior (`SIGINT`, `SIGQUIT`, etc.) to mimic bash-like interactive behavior.
 
 ---
 
@@ -27,7 +75,8 @@ Key features implemented:
 - GNU `readline` library installed
 - `make`
 
-On macOS, readline may require:
+### macOS setup (if needed)
+
 ```bash
 brew install readline
 export LDFLAGS="-L$(brew --prefix readline)/lib"
@@ -87,6 +136,3 @@ AI tools (ChatGPT / Claude) were used during this project for the following task
 - **Conceptual explanations**: Understanding how `fork`/`execve`/`waitpid` interact, how pipe file descriptors need to be managed across child processes, and how heredoc behavior differs from standard redirections.
 - **Debugging assistance**: Identifying issues with signal handling edge cases and file descriptor leaks by describing symptoms and asking for potential causes.
 - **Code review suggestions**: Asking for feedback on specific functions (e.g., the tokenizer/lexer logic) to spot edge cases we may have missed.
-- **README drafting**: The initial structure of this README was generated with AI assistance and then reviewed, corrected, and completed by the project authors.
-
-> All AI-generated content was reviewed, understood, and validated before being included in the project. No AI-generated code was used without full comprehension and testing by the authors.
